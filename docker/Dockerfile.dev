@@ -1,0 +1,12 @@
+FROM node:21-alpine as build
+WORKDIR /app/home/bugtrap
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run start:dev
+
+EXPOSE 8080
+
+CMD ["npm", "run", "start:dev"]
