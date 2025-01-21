@@ -2,9 +2,10 @@ version: '3.3'
 
 services:
  api: 
-  context:
-    ./docker/Dockerfile.dev
+  build:
+    context: ../
+    dockerfile: docker/Dockerfile.dev
   ports: 
-   - '8080:8080'
+   - '3000:3000'
   volumes:
-   - ./apps/api:/app/home/bugtrap
+   - ../apps/api:/home/app/bugtrap

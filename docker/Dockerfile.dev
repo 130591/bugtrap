@@ -1,12 +1,21 @@
-FROM node:21-alpine as build
-WORKDIR /app/home/bugtrap
+FROM node:21 as build
 
-COPY package*.json ./
-RUN npm install
+LABEL description="bugtrap-app"
+LABEL version="1.0.0"
 
-COPY . .
-RUN npm run start:dev
+ENV HOME=/usr/src/app
 
-EXPOSE 8080
+WORKDIR ${HOME}
+
+COPY ./apps/api/ ${HOME}/bugtrap/
+WORKDIR ${HOME}/bugtrap
+
+RUN npm install --frozen-lockfile
+
+RUN npm install --save-dev @nestjs/cli
+
+RUN ./node_modules/.bin/nest --version
+
+EXPOSE 3000
 
 CMD ["npm", "run", "start:dev"]
