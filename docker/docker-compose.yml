@@ -1,4 +1,6 @@
-version: '3.3'
+version: '3.8'
+
+name: bugtrap
 
 services:
  api: 
@@ -9,3 +11,29 @@ services:
    - '3000:3000'
   volumes:
    - ../apps/api:/home/app/bugtrap
+  depends_on:
+    - db
+    - redis
+ db:
+  image: postgres:15-alpine
+  container_name: bugtrap-db
+  environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=postgres
+  ports:
+    - '5432:5432'
+  volumes:
+    - .data:/var/lib/postgresql/data
+    - ../scripts/db/dump-db.sql:/docker-entrypoint-initdb.d/dump-db.sql
+ redis:
+  image: redis:latest
+  container_name: redis-container
+  ports:
+    - "6379:6379"
+  networks:
+    - redis-network
+  restart: unless-stopped
+
+networks:
+  redis-network:
+    driver: bridge
