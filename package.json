@@ -16,5 +16,8 @@
   "license": "ISC",
   "dependencies": {
     "@nestjs/cli": "^10.4.9"
+  },
+  "devDependencies": {
+    "nx": "20.4.0"
   }
 }
