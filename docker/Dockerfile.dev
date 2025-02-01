@@ -10,11 +10,7 @@ WORKDIR ${HOME}
 COPY ./apps/api/ ${HOME}/bugtrap/
 WORKDIR ${HOME}/bugtrap
 
-RUN npm install --frozen-lockfile
-
-RUN npm install --save-dev @nestjs/cli
-
-RUN ./node_modules/.bin/nest --version
+RUN npm install --frozen-lockfile && npm install --save-dev @nestjs/cli
 
 EXPOSE 3000
 
