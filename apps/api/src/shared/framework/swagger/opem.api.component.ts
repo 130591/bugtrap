@@ -1,5 +1,5 @@
-import { OpenAPIObject } from "@nestjs/swagger";
-import Nimma from "nimma";
+import { OpenAPIObject } from '@nestjs/swagger';
+import Nimma from 'nimma';
 
 const jpath = '$.paths..responses["200","201"].content["application/json"]';
 
@@ -15,11 +15,13 @@ export function removeEndpointsWithoutApiKey<T>(openApiDocument: T): T {
     for (const method in operations) {
       const operation = operations[method];
       if (operation.security) {
-        const hasApiKey = operation.security.some((sec: { [key: string]: string[] }) =>
-          Object.keys(sec).includes('api-key')
+        const hasApiKey = operation.security.some(
+          (sec: { [key: string]: string[] }) =>
+            Object.keys(sec).includes('api-key'),
         );
-        operation.security = operation.security.filter((sec: { [key: string]: string[] }) =>
-          Object.keys(sec).includes('api-key')
+        operation.security = operation.security.filter(
+          (sec: { [key: string]: string[] }) =>
+            Object.keys(sec).includes('api-key'),
         );
         if (!hasApiKey) {
           delete operations[method];

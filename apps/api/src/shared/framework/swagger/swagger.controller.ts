@@ -1,13 +1,22 @@
-import { INestApplication } from "@nestjs/common";
-import { DocumentBuilder, OpenAPIObject, SwaggerModule } from "@nestjs/swagger";
+import { INestApplication } from '@nestjs/common';
+import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import { injectDocumentComponents } from './injection';
-import { removeEndpointsWithoutApiKey, transformDocument } from "./opem.api.component";
+import {
+  removeEndpointsWithoutApiKey,
+  transformDocument,
+} from './opem.api.component';
 
 const options = new DocumentBuilder()
-.setTitle('BugTrap API')
-.setDescription('BugTrap REST API. Please see https://docs.novu.co/api-reference for more details.')
-.setVersion('1.0')
-.setContact('BugTrap Support', 'https://discord.gg/bugtrap', 'support@bugtrap.co')
+  .setTitle('BugTrap API')
+  .setDescription(
+    'BugTrap REST API. Please see https://docs.novu.co/api-reference for more details.',
+  )
+  .setVersion('1.0')
+  .setContact(
+    'BugTrap Support',
+    'https://discord.gg/bugtrap',
+    'support@bugtrap.co',
+  );
 
 function sdkSetup(app: INestApplication, document: OpenAPIObject) {
   document['x-speakeasy-name-override'] = [
@@ -39,17 +48,18 @@ function sdkSetup(app: INestApplication, document: OpenAPIObject) {
 }
 
 export const setupSwagger = (app: INestApplication) => {
-	const document = injectDocumentComponents(
-		SwaggerModule.createDocument(app, options.build(), {
-			operationIdFactory: (controllerKey: string, methodKey: string) => `${controllerKey}_${methodKey}`,
-			deepScanRoutes: true,
+  const document = injectDocumentComponents(
+    SwaggerModule.createDocument(app, options.build(), {
+      operationIdFactory: (controllerKey: string, methodKey: string) =>
+        `${controllerKey}_${methodKey}`,
+      deepScanRoutes: true,
       ignoreGlobalPrefix: false,
       include: [],
       extraModels: [],
-		})
-	)
+    }),
+  );
 
-	SwaggerModule.setup('api', app, {
+  SwaggerModule.setup('api', app, {
     ...document,
     info: {
       ...document.info,
