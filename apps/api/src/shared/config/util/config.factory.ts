@@ -3,10 +3,14 @@ import { configSchema } from './config.schema';
 import { Config } from './config.type';
 
 export const factory = (): Config => {
-    const result = configSchema.safeParse({
+  const result = configSchema.safeParse({
     env: process.env.NODE_ENV,
     port: parseInt(process.env.PORT!),
     api_version: process.env.API_VERSION,
+    redis: {
+      host: process.env.REDIS_HOST,
+      port: Number(process.env.REDIS_PORT),
+    },
     database: {
       host: process.env.DB_HOST,
       database: process.env.DB_DATABASE,
@@ -25,5 +29,7 @@ export const factory = (): Config => {
     return result.data;
   }
 
-  throw new ConfigException(`Invalid application configuration: ${result.error.message}`);
+  throw new ConfigException(
+    `Invalid application configuration: ${result.error.message}`,
+  );
 };

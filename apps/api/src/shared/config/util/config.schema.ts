@@ -2,13 +2,6 @@ import { z } from 'zod';
 
 export const environmentSchema = z.enum(['test', 'development', 'production']);
 
-export const zendeskSchema = z.object({
-  url: z.string().url(),
-  auth_usuario: z.string(),
-  auth_token: z.string(),
-  token_jwt: z.string(),
-});
-
 export const databaseSchema = z.object({
   host: z.string(),
   database: z.string(),
@@ -18,6 +11,11 @@ export const databaseSchema = z.object({
   username: z.string(),
 });
 
+export const redisSchema = z.object({
+  host: z.string(),
+  port: z.number(),
+});
+
 export const storageSchema = z.object({
   project_id: z.string(),
   key_file_name: z.string(),
@@ -25,13 +23,9 @@ export const storageSchema = z.object({
 
 export const configSchema = z.object({
   env: z.string(),
-  temp_dir: z.string(),
   api_version: z.string(),
   port: z.coerce.number().positive().int(),
-  graphql_url: z.string(),
-  jwt_token: z.string(),
+  redis: redisSchema,
   database: databaseSchema,
-  zendesk: zendeskSchema,
   storage: storageSchema,
-  auth_url: z.string(),
 });

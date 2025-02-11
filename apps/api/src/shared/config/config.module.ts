@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-imports */
-import { DynamicModule } from '@nestjs/common';
+import { DynamicModule, Global } from '@nestjs/common';
 import {
   ConfigModule as NestConfigModule,
   ConfigModuleOptions as NestConfigModuleOptions,
@@ -7,6 +7,7 @@ import {
 import { ConfigService } from './service/config.service';
 import { factory } from './util/config.factory';
 
+@Global()
 export class ConfigModule {
   static forRoot(options?: NestConfigModuleOptions): DynamicModule {
     return {
