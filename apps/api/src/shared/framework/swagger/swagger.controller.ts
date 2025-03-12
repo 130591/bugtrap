@@ -9,7 +9,7 @@ import {
 const options = new DocumentBuilder()
   .setTitle('BugTrap API')
   .setDescription(
-    'BugTrap REST API. Please see https://docs.novu.co/api-reference for more details.',
+    'BugTrap REST API. Please see https://docs.bugtrap.co./api-reference for more details.',
   )
   .setVersion('1.0')
   .setContact(
