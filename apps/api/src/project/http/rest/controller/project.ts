@@ -10,7 +10,7 @@ import {
 import { CommonResponse, CommonParam, ICommonParams } from '@src/shared/lib/apicommon'
 import { CreateService } from '@src/project/core/service/create'
 import { ListService } from '@src/project/core/service/list'
-import { CreateProjectRequestDto, ResponseDto } from '../dto'
+import { CreateProjectRequestDto, GetResponseDto, ResponseDto } from '../dto'
 
 @Controller('/project')
 export class ProjectController {
@@ -37,7 +37,7 @@ export class ProjectController {
     defaultLimit: 12,
     maxLimit: 20,
     isSorted: true,
-    type: [CreateProjectRequestDto]
+    type: [GetResponseDto]
   })
   async listProject(
     @Param('accountId') accountId: string,
@@ -46,25 +46,26 @@ export class ProjectController {
   ) {
     const { 
       page = 1,  
-      limit = 20, 
+      limit = 12, 
       orderBy = 'createdAt', 
       orderDirection = 'DESC' 
     } = queryParams
-  
-    const { count, result } = await this.list.execute({
+
+    const { count, result, nextPage } = await this.list.execute({
       accountId,
       page: Number(page),
       limit: Math.min(Number(limit), 20),
       orderBy,
       orderDirection,
     })
-
+    
     params.setPaginationInfo({
       count,
+      nextPage,
       offset: Number(page),
-      limit: Math.min(Number(limit), 20)
+      limit: Math.min(Number(limit), 20),
     })
-    
+  
     return result
   }
 }

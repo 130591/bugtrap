@@ -8,7 +8,7 @@ import { getFiltering } from "../functions/get-filtering"
 
 type SettablePaginationInfo = Pick<
   PaginationDto,
-  'count' | 'limit' | 'offset'
+  'count' | 'limit' | 'offset' | 'nextPage'
 >;
 type SettableSortingInfo = Pick<SortingDto, 'sort'>
 type SettableFilteringInfo = Pick<FilteringDto, 'filter'>

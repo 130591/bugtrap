@@ -25,6 +25,11 @@ export class PaginationDto implements PaginatedResponseOptions {
   @ApiProperty()
   @IsInt()
   @IsPositive()
+  nextPage:  number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsPositive()
   offset: number;
 
   @ApiPropertyOptional()

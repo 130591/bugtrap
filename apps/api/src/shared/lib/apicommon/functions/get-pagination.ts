@@ -28,14 +28,14 @@ export async function getPagination(
       const newMetadata = {
         ...currentMetadata,
         ...metadata,
-      };
+      }
       Reflect.defineMetadata(
         RESPONSE_PAGINATION_INFO_KEY,
         newMetadata,
         handler,
       );
     },
-  };
+  }
   return pagination
 }
 
