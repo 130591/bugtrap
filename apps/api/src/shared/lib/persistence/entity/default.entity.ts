@@ -13,30 +13,30 @@ import {
  */
 export abstract class DefaultEntity<T> {
   constructor(data: Partial<T>) {
-    Object.assign(this, data);
-    this.id = this.id || randomUUID();
+    Object.assign(this, data)
+    this.id = this.id || randomUUID()
   }
   @BeforeInsert()
   beforeInsert(): void {
-    this.createdAt = this.createdAt || new Date();
-    this.updatedAt = new Date();
+    this.createdAt = this.createdAt || new Date()
+    this.updatedAt = new Date()
   }
 
   @BeforeUpdate()
   beforeUpdate(): void {
-    this.updatedAt = new Date();
+    this.updatedAt = new Date()
   }
 
   @PrimaryColumn({ type: 'uuid' })
-  id: string;
+  id: string
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date
 
   //TODO add soft remove
-  @DeleteDateColumn({ nullable: true })
-  deletedAt: Date | null;
+  @DeleteDateColumn({ nullable: true, name: 'deleted_at' })
+  deletedAt: Date | null
 }

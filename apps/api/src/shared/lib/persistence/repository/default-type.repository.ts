@@ -2,6 +2,7 @@ import { DefaultEntity } from '@src/shared/lib/persistence/entity/default.entity
 import {
   EntityManager,
   EntityTarget,
+  FindManyOptions,
   FindOneOptions,
   FindOptionsWhere,
   Repository,
@@ -35,8 +36,8 @@ export abstract class DefaultTypeOrmRepository<T extends DefaultEntity<T>> {
     return this.repository.findOne(options);
   }
 
-  async findMany(options: FindOneOptions<T>): Promise<T[] | null> {
-    return this.repository.find({ where: options.where })
+  async findMany(options: FindManyOptions<T>): Promise<T[] | null> {
+    return this.repository.find(options)
   }
 
   async exists(id: string): Promise<boolean> {
