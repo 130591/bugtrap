@@ -10,7 +10,7 @@ export class QueryService {
 
   async apply(params: any, aliasEntity) {
     const queryBuilder = await this.buildQuery(params, aliasEntity)
-    return await this.executeQuery(queryBuilder)
+    return await this.executeQuery(queryBuilder, params.page, params.limit)
   }
 
   private async buildQuery(params: any, aliasEntity: string) {
@@ -33,11 +33,14 @@ export class QueryService {
   }
   
 
-  private async executeQuery(queryBuilder: any) {
+  private async executeQuery(queryBuilder: any, page: number, limit: number) {
     const [result, count] = await Promise.all([
       queryBuilder.getMany(),
       queryBuilder.getCount(),
     ]);
-    return { result, count }
+    const hasMore = count > page * limit
+    const nextPage = hasMore ? page + 1 : null
+  
+    return { result, count, nextPage } 
   }
 }
