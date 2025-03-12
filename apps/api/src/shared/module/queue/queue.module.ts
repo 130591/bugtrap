@@ -5,23 +5,25 @@ import { ConfigModule } from '@src/shared/config/config.module';
 import { QueueService } from './queue.service';
 import { QueueFactory } from './queues-factory';
 
+
 @Module({
   imports: [
-    ConfigModule,
-    BullModule.forRootAsync({
-      useFactory: async (configService: ConfigService) => ({
-        connection: {
-          host: configService.get('redis').host || 'localhost',
-          port: configService.get('redis').port || 6379,
-        },
-      }),
-      inject: [ConfigService],
-    }),
-    BullModule.registerQueue(
-    ...QueueFactory.map((queueList) => ({
-        name: queueList
-      })
-    ).flat())
+     ConfigModule,
+     BullModule.forRootAsync({
+       imports: [ConfigModule],
+       useFactory: async (configService: ConfigService) => ({
+         connection: {
+           host: configService.get('redis').host || 'localhost',
+           port: configService.get('redis').port || 6379,
+         },
+       }),
+       inject: [ConfigService],
+     }),
+     BullModule.registerQueue(
+       ...QueueFactory.map((queueList) => ({
+         name: queueList,
+       }))
+     ),
   ],
   providers: [QueueService],
   exports: [QueueService],

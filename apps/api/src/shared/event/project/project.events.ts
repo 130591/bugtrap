@@ -1,3 +1,5 @@
-export enum PROJECT_EVENT {
-  PROJECT_CREATED = 'project.created',
+export enum ProjectEvent {
+  CREATED = 'project.created',
+  UPDATED = 'project.updated',
+  DELETED = 'project.deleted',
 }

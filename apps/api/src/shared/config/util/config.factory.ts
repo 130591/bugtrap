@@ -7,6 +7,8 @@ export const factory = (): Config => {
     env: process.env.NODE_ENV,
     port: parseInt(process.env.PORT!),
     api_version: process.env.API_VERSION,
+    base_url: process.env.BASE_URL,
+    email_service: process.env.EMAIL_SERVICE,
     redis: {
       host: process.env.REDIS_HOST,
       port: Number(process.env.REDIS_PORT),
