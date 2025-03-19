@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -10,12 +11,18 @@ import {
 import { CommonResponse, CommonParam, ICommonParams } from '@src/shared/lib/apicommon'
 import { CreateService } from '@src/project/core/service/create'
 import { ListService } from '@src/project/core/service/list'
-import { CreateProjectRequestDto, GetResponseDto, ResponseDto } from '../dto'
+import { ChangeStatusDto, ChangeStatusResponseDto, CreateProjectRequestDto, GetResponseDto, InviteMemberDto, ResponseDto, ResponseInviteMemberDto } from '../dto'
+import { InviteMemberService } from '@src/project/core/service/invite-member'
+import { ConfirmInvitationService } from '@src/project/core/service/confirm-invite'
+import { ChangeStatusService } from '@src/project/core/service/change-status'
 
 @Controller('/project')
 export class ProjectController {
   constructor(
-    private readonly create: CreateService, 
+    private readonly create: CreateService,
+    private readonly changeStatus: ChangeStatusService,
+    private readonly confirmInvitation: ConfirmInvitationService,
+    private readonly inviteMember: InviteMemberService,
     private readonly list: ListService) {}
 
   @Post()
@@ -30,8 +37,32 @@ export class ProjectController {
     return await this.create.perform(data)
   }
 
+  @Post('member')
+  @CommonResponse({
+    type: [ResponseInviteMemberDto],
+    status: 201
+  })
+  async invite( @Req() _req: Request,
+  @Body() data: InviteMemberDto) {
+    return await this.inviteMember.execute(data)
+  }
 
-  @Get('/:accountId')
+  @Post(':projectId/invitations/:invitationId/confirm')
+  async confirmInvite(@Param('projectId') projectId: string, @Param('invitationId') invitationId: string) {
+    return await this.confirmInvitation.execute({ projectId: projectId, token: invitationId })
+  }
+
+  @Patch(':projectId/status')
+  @CommonResponse({
+    type: [ChangeStatusResponseDto],
+    status: 201
+  })
+  async status(@Param('projectId') projectId: string,
+  @Body() data: ChangeStatusDto) {
+    return await this.changeStatus.execute({ projectId: projectId , status: data.status })
+  }
+
+  @Get(':accountId')
   @CommonResponse({
     isPaginated: true,
     defaultLimit: 12,

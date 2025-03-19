@@ -3,6 +3,7 @@ import { EntityManager } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
 import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/repository/default-type.repository'
 import { ProjectEntity } from '../entities/project.entity'
+import { CreateProjectCommand } from '../../core/contract/command.contract'
 
 @Injectable()
 export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
@@ -14,6 +15,8 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
 
   async getQueryBuilder(alias: string) {
     return this.transactionalEntityManager.createQueryBuilder(ProjectEntity, alias)
+      .leftJoinAndSelect(`${alias}.members`, 'members')
+      .leftJoinAndSelect(`${alias}.invitations`, 'invitations')
   }
 
   async countActiveProjectsForOwner(id: any) {
@@ -46,12 +49,12 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
   }
 
   @Transactional()
-  async persist(command: any) {
+  async persist(command: CreateProjectCommand) {
     const project = new ProjectEntity({
       description: command.description,
       project_name: command.projectName,
-      startDate: command.beginProject[0],
-      endDate: command.beginProject[1],
+      startDate: new Date(command.beginProject[0]),
+      endDate: new Date(command.beginProject[1]),
       account_id: command.accountId,
       owner_id: command.ownerId,
     })
