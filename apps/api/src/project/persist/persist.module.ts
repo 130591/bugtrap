@@ -2,7 +2,8 @@ import { DynamicModule } from '@nestjs/common'
 import { TypeOrmPersistenceModule } from '@src/shared/lib/persistence/typeorm-persistence.module'
 import { ProjectRepository } from './repository/project.repositoty'
 import { ENTITIES } from './entities'
-import { QueryService } from './queries/query.service'
+import { ProjectQueryService } from './queries'
+import { InvitationRepository } from './repository/invitation.repository'
 
 export class PersistModule {
   static forRoot(opts?: { migrations?: string[] }): DynamicModule {
@@ -18,11 +19,13 @@ export class PersistModule {
       ],
       providers: [
         ProjectRepository,
-        QueryService
+        InvitationRepository,
+        ProjectQueryService
       ],
       exports: [
         ProjectRepository,
-        QueryService
+        InvitationRepository,
+        ProjectQueryService
       ],
     }
   }
