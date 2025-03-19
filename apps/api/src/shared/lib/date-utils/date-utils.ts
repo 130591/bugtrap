@@ -1,7 +1,9 @@
 import { addYears, isAfter, isBefore } from 'date-fns'
+import { addDays } from 'date-fns';
+import { toZonedTime, format } from 'date-fns-tz';
 
 
-export class DateTransform {
+export class DateUtils {
 	static isAfterCurrentDate(date: Date): boolean {
     const currentDate = new Date()
     return isAfter(currentDate, date)
@@ -40,5 +42,14 @@ export class DateTransform {
       console.error('Erro: Data de início do projeto está muito no futuro')
       throw new Error('Project start date cannot be more than 2 years in the future')
     }
+  }
+
+  static generateFutureDate(days: number) {
+    const timeZone = 'America/New_York'
+    const now = new Date();
+    const zonedNow = toZonedTime(now, timeZone)
+    const futureDate = addDays(zonedNow, days)
+    const formattedDate = format(futureDate, 'yyyy-MM-dd HH:mm:ssXXX', { timeZone })
+    return new Date(formattedDate)
   }
 }

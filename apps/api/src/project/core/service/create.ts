@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
-import { DateTransform } from '@src/shared/lib/date-compare/date-compare'
+import { DateUtils } from '@src/shared/lib/date-utils/date-utils'
 import { CreateProjectRequestDto } from '@src/project/http/rest/dto/request/project.dto'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { ExternalIdentityClient } from '@src/project/http/client/external-client-identity'
 import { PublisherService } from '@src/shared/lib/hive'
 import { ProjectEvent } from '@src/shared/event'
-
+import { CreateProjectCommand } from '@src/project/core/contract/command.contract'
 
 const MAX_PROJECTS_FOR_OWNER = 100
 
@@ -20,8 +20,14 @@ export class CreateService {
   async perform(command: CreateProjectRequestDto) {
     await this.validateAccountAndOwner(command)
     await this.validateOwnerProjects(command.ownerId)
-    DateTransform.validateProjectDates(command.beginProject)
-    return await this.createProject(command)
+    DateUtils.validateProjectDates(command.beginProject)
+    return await this.createProject({
+      accountId: command.accountId,
+      beginProject: command.beginProject,
+      description: command.description,
+      ownerId: command.ownerId,
+      projectName: command.projectName
+    })
   }
 
   private async validateAccountAndOwner(command: CreateProjectRequestDto) {
@@ -47,9 +53,9 @@ export class CreateService {
     }
   }
 
-  private async createProject(command: CreateProjectRequestDto) {
+  private async createProject(command: CreateProjectCommand) {
     const result = await this.repository.persist(command)
-    await this.event.publish(ProjectEvent.CREATED, JSON.stringify(command))
+    await this.event.emit(ProjectEvent.CREATED, JSON.stringify(command))
     return result
   }
 }

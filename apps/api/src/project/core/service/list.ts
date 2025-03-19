@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common"
-import { QueryService } from "@src/project/persist/queries/query.service"
+import { ProjectQueryService } from '@src/project/persist/queries'
 
 @Injectable()
 export class ListService {
 	constructor(
-		private readonly query: QueryService
+		private readonly query: ProjectQueryService
 	) {}
 
 	async execute(params: any) {

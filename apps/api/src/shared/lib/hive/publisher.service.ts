@@ -9,7 +9,7 @@ export class PublisherService {
     this.redisClient = new Redis(process.env.REDIS_URL)
   }
 
-  async publish(event: string, data: any): Promise<void> {
+  async emit(event: string, data: any): Promise<void> {
     try {
       await this.redisClient.publish(event, JSON.stringify(data))
     } catch (error) {
