@@ -9,6 +9,7 @@ export const factory = (): Config => {
     api_version: process.env.API_VERSION,
     base_url: process.env.BASE_URL,
     email_service: process.env.EMAIL_SERVICE,
+    secret_token: process.env.SECRET_JWT,
     redis: {
       host: process.env.REDIS_HOST,
       port: Number(process.env.REDIS_PORT),

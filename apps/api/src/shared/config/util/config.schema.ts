@@ -25,6 +25,7 @@ export const configSchema = z.object({
   env: z.string(),
   api_version: z.string(),
   base_url: z.string(),
+  secret_token: z.string(),
   port: z.coerce.number().positive().int(),
   email_service: z.string(),
   redis: redisSchema,

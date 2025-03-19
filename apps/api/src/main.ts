@@ -1,10 +1,35 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { setupSwagger } from './shared/framework/swagger';
+import 'reflect-metadata'
+import { NestFactory } from '@nestjs/core'
+import { ValidationPipe } from '@nestjs/common'
+import { initializeTransactionalContext } from 'typeorm-transactional'
+import { DataSource } from 'typeorm'
+import { AppModule } from './app.module'
+import { ConfigService } from './shared/config/service/config.service'
+import { setupSwagger } from './shared/framework/swagger'
+
+function buildOpt (configService) {
+  return {
+    type: 'postgres',
+    logging: false,
+    autoLoadEntities: false,
+    synchronize: false,
+    migrationsTableName: 'typeorm_migrations',
+    ...configService.get('database'),
+  }
+}
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  initializeTransactionalContext()
+  const app = await NestFactory.create(AppModule)
+  app.useGlobalPipes(new ValidationPipe({ transform: true }))
+  const configService = app.get(ConfigService) as Record<string, any>
+  const options = buildOpt(configService)
+  const dataSource = new DataSource(options)
+  await dataSource.initialize()
+
   setupSwagger(app)
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT || 3000
+  await app.listen(port)
 }
-bootstrap();
+
+bootstrap()
