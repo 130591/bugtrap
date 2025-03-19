@@ -4,13 +4,15 @@ LABEL description="bugtrap-app"
 LABEL version="1.0.0"
 
 ENV HOME=/usr/src/app
-
 WORKDIR ${HOME}
 
 COPY ./apps/api/ ${HOME}/bugtrap/
+
 WORKDIR ${HOME}/bugtrap
 
-RUN npm install --frozen-lockfile && npm install --save-dev @nestjs/cli
+RUN pnpm config set global-bin-dir /usr/local/bin
+
+RUN corepack enable && pnpm install --no-frozen-lockfile && pnpm add @nestjs/cli --save-dev
 
 EXPOSE 3000
 

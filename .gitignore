@@ -2,7 +2,11 @@
 
 # postgres
 /docker/.data
-
+/docker/volume
+.env
 
 .nx/cache
 .nx/workspace-data
+
+domain-identity.yaml
+domain-projects.yaml
