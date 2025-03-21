@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
-import { EntityManager } from 'typeorm'
+import { DataSource } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
 import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/repository/default-type.repository'
 import { InvitationEntity } from '../entities/invite.entity'
-import { InvitationStatus } from '@src/project/core/constants'
+import { InjectDataSource } from '@nestjs/typeorm'
 
 interface CommandInvite {
   token: string;
@@ -17,15 +17,15 @@ interface CommandInvite {
 
 @Injectable()
 export class InvitationRepository extends DefaultTypeOrmRepository<InvitationEntity> {
-
 	constructor(
-		private readonly transactionalEntityManager: EntityManager,
+		@InjectDataSource('project')
+		dataSource: DataSource
 	) {
-		super(InvitationEntity, transactionalEntityManager)
+		super(InvitationEntity, dataSource.manager)
 	}
 
 	async findInviteByToken(token: string) {
-		const invite = await this.findMany({ 
+		const invite = await this.findMany({
 			where: { token: token } 
 		})
 

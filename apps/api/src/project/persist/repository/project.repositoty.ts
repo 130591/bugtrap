@@ -1,20 +1,23 @@
-import { Injectable } from '@nestjs/common'
-import { EntityManager } from 'typeorm'
+import { Injectable, Logger } from '@nestjs/common'
+import { InjectDataSource } from '@nestjs/typeorm'
+import { DataSource } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
 import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/repository/default-type.repository'
 import { ProjectEntity } from '../entities/project.entity'
 import { CreateProjectCommand } from '../../core/contract/command.contract'
 
+
 @Injectable()
 export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
   constructor(
-    private readonly transactionalEntityManager: EntityManager,
+    @InjectDataSource('project')
+    private readonly dataSource: DataSource
   ) {
-    super(ProjectEntity, transactionalEntityManager)
+    super(ProjectEntity, dataSource.manager)
   }
 
   async getQueryBuilder(alias: string) {
-    return this.transactionalEntityManager.createQueryBuilder(ProjectEntity, alias)
+    return this.dataSource.createQueryBuilder(ProjectEntity, alias)
       .leftJoinAndSelect(`${alias}.members`, 'members')
       .leftJoinAndSelect(`${alias}.invitations`, 'invitations')
   }

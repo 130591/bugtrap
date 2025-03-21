@@ -5,7 +5,7 @@ import { HiveModule } from '@src/shared/lib/hive'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { QueueModule } from '@src/shared/module/queue/queue.module'
 import { ConfigModule } from '@src/shared/config/config.module'
-import { PersistModule } from './persist/persist.module'
+import { ProjectPersistModule } from './persist/persist.module'
 import { ProjectController } from './http/rest/controller/project'
 import { ListService } from './core/service/list'
 import { CreateService } from './core/service/create'
@@ -23,7 +23,7 @@ import {
 
 @Module({
   imports: [
-    PersistModule.forRoot(),
+    ProjectPersistModule,
     QueueModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

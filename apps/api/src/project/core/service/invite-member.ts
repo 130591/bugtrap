@@ -63,7 +63,7 @@ export class InviteMemberService {
       this.publicAPI.findUserById(command.hostId),
       this.publicAPI.findUserByEmail(command.guestEmail)
     ])
-
+    
     const member = await this.projectRepo.find({ where: { members: { user_id: user.id } } })
     if (member)  throw new ConflictException('User is already a member of this project')
 
