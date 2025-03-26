@@ -1,6 +1,6 @@
-import { ConfigException } from '../exception/config.exception';
-import { configSchema } from './config.schema';
-import { Config } from './config.type';
+import { ConfigException } from '../exception/config.exception'
+import { configSchema } from './config.schema'
+import { Config } from './config.type'
 
 export const factory = (): Config => {
   const result = configSchema.safeParse({
@@ -10,6 +10,7 @@ export const factory = (): Config => {
     base_url: process.env.BASE_URL,
     email_service: process.env.EMAIL_SERVICE,
     secret_token: process.env.SECRET_JWT,
+    broker_uri: process.env.BROKER_URI,
     redis: {
       host: process.env.REDIS_HOST,
       port: Number(process.env.REDIS_PORT),
@@ -26,7 +27,13 @@ export const factory = (): Config => {
       project_id: process.env.PROJECT_ID,
       key_file_name: process.env.KEY_FILE_NAME,
     },
-  });
+    auth_config: {
+      auth_domain: process.env.AUTH0_DOMAIN,
+      auth_audience: process.env.AUTH0_AUDIENCE,
+      auth_client_id: process.env.AUTH0_CLIENT_ID,
+      auth_client_secret: process.env.AUTH0_CLIENT_SECRET
+    }
+  })
 
   if (result.success) {
     return result.data;
@@ -34,5 +41,5 @@ export const factory = (): Config => {
 
   throw new ConfigException(
     `Invalid application configuration: ${result.error.message}`,
-  );
-};
+  )
+}

@@ -1,19 +1,17 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { BROKER_INSTANCE } from './broker.module';
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq'
 
 @Injectable()
 export class BrokerService {
   constructor(
-    @Inject(BROKER_INSTANCE) private readonly clientProxy: ClientProxy,
+    private readonly amqpConnection: AmqpConnection,
   ) {}
 
-  async emit<T>(eventName: string, data: T): Promise<void> {
-    if (this.clientProxy) {
-      await this.clientProxy.emit(eventName, data);
+  async emit<T>(eventName: string, queue: string, data: T): Promise<void> {
+    if (this.amqpConnection) {
+      await this.amqpConnection.publish(eventName, queue, data)
     } else {
-      throw new InternalServerErrorException('Redis client not initialized.');
+      throw new InternalServerErrorException('Redis client not initialized.')
     }
   }
 }

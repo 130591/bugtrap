@@ -1,10 +1,8 @@
-import { DynamicModule, Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ConfigService } from '@src/shared/config/service/config.service';
-import { ConfigModule } from '@src/shared/config/config.module';
-import { BrokerService } from './broker.service';
-
-export const BROKER_INSTANCE = 'REDIS_SERVICE'
+import { DynamicModule, Module } from '@nestjs/common'
+import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq'
+import { ConfigService } from '@src/shared/config/service/config.service'
+import { ConfigModule } from '@src/shared/config/config.module'
+import { BrokerService } from './broker.service'
 
 @Module({
   imports: [ConfigModule],
@@ -14,23 +12,17 @@ export class BrokerModule {
     return {
       module: BrokerModule,
       imports: [
-        ClientsModule.registerAsync([
-          {
-            name: BROKER_INSTANCE,
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: async (configService: ConfigService) => ({
-              transport: Transport.REDIS,
-              options: {
-                host: configService.get('redis').host || 'localhost',
-                port: Number(configService.get('redis').port) || 6379,
-              },
-            }),
-          },
-        ]),
+        RabbitMQModule.forRootAsync({
+          useFactory: async (configService: ConfigService) => ({
+            exchanges: [{ name: 'pdf_events', type: 'direct' }],
+            uri: configService.get('broker_uri') || 'amqp://localhost',
+            enableControllerDiscovery: true,
+          }),
+          inject: [ConfigService],
+        }),
       ],
       providers: [BrokerService],
       exports: [BrokerService],
-    };
+    }
   }
 }

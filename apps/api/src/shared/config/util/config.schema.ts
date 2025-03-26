@@ -21,10 +21,19 @@ export const storageSchema = z.object({
   key_file_name: z.string(),
 })
 
+export const authSchema = z.object({
+  auth_domain: z.string(),
+  auth_client_id: z.string(),
+  auth_client_secret: z.string(),
+  auth_audience: z.string()
+})
+
 export const configSchema = z.object({
   env: z.string(),
   api_version: z.string(),
+  broker_uri: z.string(),
   base_url: z.string(),
+  auth_config: authSchema,
   secret_token: z.string(),
   port: z.coerce.number().positive().int(),
   email_service: z.string(),
