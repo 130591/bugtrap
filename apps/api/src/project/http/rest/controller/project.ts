@@ -11,7 +11,15 @@ import {
 import { CommonResponse, CommonParam, ICommonParams } from '@src/shared/lib/apicommon'
 import { CreateService } from '@src/project/core/service/create'
 import { ListService } from '@src/project/core/service/list'
-import { ChangeStatusDto, ChangeStatusResponseDto, CreateProjectRequestDto, GetResponseDto, InviteMemberDto, ResponseDto, ResponseInviteMemberDto } from '../dto'
+import { 
+  ChangeStatusDto, 
+  ChangeStatusResponseDto, 
+  CreateProjectRequestDto, 
+  GetResponseDto, 
+  InviteMemberDto, 
+  ResponseDto, 
+  ResponseInviteMemberDto 
+} from '../dto'
 import { InviteMemberService } from '@src/project/core/service/invite-member'
 import { ConfirmInvitationService } from '@src/project/core/service/confirm-invite'
 import { ChangeStatusService } from '@src/project/core/service/change-status'
@@ -48,8 +56,15 @@ export class ProjectController {
   }
 
   @Post(':projectId/invitations/:invitationId/confirm')
-  async confirmInvite(@Param('projectId') projectId: string, @Param('invitationId') invitationId: string) {
-    return await this.confirmInvitation.execute({ projectId: projectId, token: invitationId })
+  async confirmInvite(
+    @Param('projectId') projectId: string, 
+    @Param('invitationId') invitationId: string,  
+    @Body() data: { guestEmail: string }
+  ) {
+    return await this.confirmInvitation.execute({
+      projectId: projectId, token: invitationId,
+      guestEmail: data.guestEmail,
+    })
   }
 
   @Patch(':projectId/status')
@@ -59,7 +74,10 @@ export class ProjectController {
   })
   async status(@Param('projectId') projectId: string,
   @Body() data: ChangeStatusDto) {
-    return await this.changeStatus.execute({ projectId: projectId , status: data.status })
+    return await this.changeStatus.execute({ 
+      projectId: projectId , 
+      status: data.status 
+    })
   }
 
   @Get(':accountId')

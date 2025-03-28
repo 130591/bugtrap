@@ -16,5 +16,6 @@ export interface InviteMemberCommand {
 
 export interface ConfirmInviteCommand {
   projectId: string
+  guestEmail: string
   token: string
 }

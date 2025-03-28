@@ -9,7 +9,8 @@ import { ProjectModule } from '@src/project/project.module'
 import { testDbClient } from '@testInfra/knex.database'
 import { Tables } from '@testInfra/tables-enum'
 import { createNestApp } from '@testInfra/test-e2e.setup'
-import { createTestFixtures, TestData } from '../fixtures'
+import { createTestFixtures } from '@testInfra/global-fixtures'
+
 
 describe('ProjectController (e2e)', () => {
   let app: INestApplication

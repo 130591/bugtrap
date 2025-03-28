@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { EmailBox } from '@src/shared/lib/emailbox'
 import { HiveModule } from '@src/shared/lib/hive'
 import { ConfigService } from '@src/shared/config/service/config.service'
-import { QueueModule } from '@src/shared/module/queue/queue.module'
+import { BrokerModule } from '@src/shared/module/broker/broker.module'
 import { ConfigModule } from '@src/shared/config/config.module'
 import { ProjectPersistModule } from './persist/persist.module'
 import { ProjectController } from './http/rest/controller/project'
@@ -14,17 +14,20 @@ import { InviteMemberService } from './core/service/invite-member'
 import { ConfirmInvitationService } from './core/service/confirm-invite'
 import { NotificationOwner } from './core/workers/project/created-project.job'
 import { ExternalIdentityClient } from './http/client/external-client-identity'
+import { ExternalPublicClient } from '@src/identity/http/client'
+import { PublicClientModule } from '@src/identity/http/client/public-client.module'
 import { 
   CreateProjectListener, 
   CreateConfirmedMember, 
   InvitationMember, 
-  InvitationMemberListener 
+  InvitationMemberListener
 } from './core/workers'
 
 @Module({
   imports: [
+    PublicClientModule, // review later
     ProjectPersistModule,
-    QueueModule,
+    BrokerModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -50,6 +53,7 @@ import {
     CreateConfirmedMember,
     InvitationMemberListener,
     ListService,
+    ExternalPublicClient,
     ConfirmInvitationService,
     EmailBox,
     ChangeStatusService,

@@ -1,3 +1,4 @@
-import { ProjectRepository } from './project.repositoty';
+import { InvitationRepository } from './invitation.repository'
+import { ProjectRepository } from './project.repositoty'
 
-export { ProjectRepository };
+export { ProjectRepository, InvitationRepository }

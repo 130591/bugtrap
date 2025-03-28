@@ -14,7 +14,10 @@ export class BrokerModule {
       imports: [
         RabbitMQModule.forRootAsync({
           useFactory: async (configService: ConfigService) => ({
-            exchanges: [{ name: 'pdf_events', type: 'direct' }],
+            exchanges: [
+              { name: 'exchange.identity', type: 'topic', createExchangeIfNotExists: true }, 
+              { name: 'exchange.invite', type: 'topic', createExchangeIfNotExists: true }
+            ],
             uri: configService.get('broker_uri') || 'amqp://localhost',
             enableControllerDiscovery: true,
           }),

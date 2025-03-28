@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
@@ -36,6 +36,22 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
       console.log('errp', error)
     }
 	}
+
+  async addMember(projectId: string, user: any, role: string): Promise<ProjectEntity> {
+    const project = await this.find({ where: { id: projectId }, relations: ['members'] });
+
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+
+    const isMember = project.members.some(member => member.id === user.id)
+    if (isMember) {
+      throw new ConflictException('User is already a member of this project')
+    }
+
+    project.members.push({ ...user, role })
+    return await this.save(project)
+  }
 
   async countProjectsByAccountId(accountId: string) {
     try {
