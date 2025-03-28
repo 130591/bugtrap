@@ -7,8 +7,11 @@ import {
   Post,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common'
 import { CommonResponse, CommonParam, ICommonParams } from '@src/shared/lib/apicommon'
+import { Roles } from '@src/shared/framework/decorators'
+import { RoleGuard } from '@src/shared/framework/guards'
 import { CreateService } from '@src/project/core/service/create'
 import { ListService } from '@src/project/core/service/list'
 import { 
@@ -33,6 +36,8 @@ export class ProjectController {
     private readonly inviteMember: InviteMemberService,
     private readonly list: ListService) {}
 
+  @Roles('create:project')
+  @UseGuards(RoleGuard)
   @Post()
   @CommonResponse({
     type: [ResponseDto],
@@ -45,6 +50,8 @@ export class ProjectController {
     return await this.create.perform(data)
   }
 
+  @Roles('create:project')
+  @UseGuards(RoleGuard)
   @Post('member')
   @CommonResponse({
     type: [ResponseInviteMemberDto],
@@ -55,6 +62,8 @@ export class ProjectController {
     return await this.inviteMember.execute(data)
   }
 
+  @Roles('create:project')
+  @UseGuards(RoleGuard)
   @Post(':projectId/invitations/:invitationId/confirm')
   async confirmInvite(
     @Param('projectId') projectId: string, 
@@ -67,6 +76,8 @@ export class ProjectController {
     })
   }
 
+  @Roles('update:project')
+  @UseGuards(RoleGuard)
   @Patch(':projectId/status')
   @CommonResponse({
     type: [ChangeStatusResponseDto],
@@ -80,6 +91,8 @@ export class ProjectController {
     })
   }
 
+  @Roles('read:project')
+  @UseGuards(RoleGuard)
   @Get(':accountId')
   @CommonResponse({
     isPaginated: true,
