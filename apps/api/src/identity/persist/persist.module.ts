@@ -60,6 +60,7 @@ const USER_QUERY_PROVIDERS = [
 		...USER_QUERY_PROVIDERS
 	],
 	exports: [
+		UserRepository,
 		AccountRepository,
     AccountQueryService,
 		UserQueryService

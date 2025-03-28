@@ -2,8 +2,7 @@ import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/co
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { AccountStatus } from '@src/identity/persist/entities/account.entity'
 import { AccountRepository } from '@src/identity/persist/repository/account.repository'
-import { ExternalAuth0Client } from '@src/identity/http/client/integration-auth0.client'
-
+import { ExternalAuth0Client } from '@src/identity/http/integration/integration-auth0.client'
 
 export interface RegisterAccountCommand {
   email: string,
@@ -26,11 +25,11 @@ export class AccountRegisterService {
     ])
 
     if (!userInfo) throw new UnauthorizedException('Unable to decode user info, invalid token')
-
+      
     if (existingAccount) {
       throw new ConflictException('An account already exists with the provided email')
     }
-		
+  
     const account = await this.repository.persist({
       email: userInfo.email,
       name: userInfo.username,
@@ -41,7 +40,7 @@ export class AccountRegisterService {
       status: AccountStatus.PENDING
     })
 		
-    await this.broker.emit('identity', 'account.registered', account)
+    await this.broker.emit('exchange.identity', 'account.registered', account)
     return account
   }
 }

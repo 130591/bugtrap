@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import * as jwt from 'jsonwebtoken'
 import * as jwksClient from 'jwks-rsa'
@@ -8,6 +8,9 @@ import { firstValueFrom } from 'rxjs'
 
 @Injectable()
 export class ExternalAuth0Client {
+
+  private readonly logger = new Logger(ExternalAuth0Client.name)
+
 	private readonly auth0Secret: string = process.env.AUTH0_SECRET
 	private readonly auth0Domain: string
   private readonly auth0ApiUrl: string
@@ -82,7 +85,6 @@ export class ExternalAuth0Client {
     try {
       const url = `${this.auth0ApiUrl}users-by-email`
       const token = await this.getAuth0ManagementApiToken()
-
       const response = await firstValueFrom(
         this.client.get(url, {
           headers: {
@@ -93,10 +95,113 @@ export class ExternalAuth0Client {
           },
         }),
       )
-			
+
       return response.data[0]
     } catch (error) {
       throw new HttpException('Failed to retrieve user by email from Auth0', HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  async createUserInAuth0(email: string, password: string): Promise<any> {
+    try {
+      const url = `${this.auth0ApiUrl}users`
+      const token = await this.getAuth0ManagementApiToken()
+  
+      const response = await firstValueFrom(
+        this.client.post(
+          url,
+          {
+            email,
+            password,
+            connection: 'Username-Password-Authentication',
+            verify_email: true,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+      )
+  
+      return response.data
+    } catch (error) {
+      throw new HttpException(
+        `Failed to create user in Auth0: ${error.response?.data?.message || error.message}`,
+        HttpStatus.BAD_REQUEST
+      )
+    }
+  }
+
+  async inviteUserWithPasswordSetup(email: string): Promise<string> {
+    try {
+      const token = await this.getAuth0ManagementApiToken()
+      const createUserResponse = await firstValueFrom(
+        this.client.post(
+          `${this.auth0ApiUrl}users`,
+          {
+            email,
+            connection: 'Username-Password-Authentication',
+            email_verified: false,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+      )
+  
+      const userId = createUserResponse.data.user_id
+      const ticketResponse = await firstValueFrom(
+        this.client.post(
+          `${this.auth0ApiUrl}tickets/password-change`,
+          {
+            result_url: 'https://meuapp.com/login',
+            user_id: userId,
+            client_id: this.auth0ClientId,
+            connection: 'Username-Password-Authentication',
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+      );
+  
+      return ticketResponse.data.ticket
+    } catch (error) {
+      throw new HttpException(
+        `Failed to invite user with password setup: ${error.response?.data?.message || error.message}`,
+        HttpStatus.BAD_REQUEST
+      )
+    }
+  }
+
+
+  async deleteUserByEmail(email: string): Promise<void> {
+    try {
+      const user = await this.getUserByAuth0Email(email)
+      if (!user) {
+        throw new Error('User not found on Auth0')
+      }
+  
+      const url = `${this.auth0ApiUrl}users/${user.user_id}`
+      const token = await this.getAuth0ManagementApiToken()
+  
+      await firstValueFrom(
+        this.client.delete(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      );
+  
+      this.logger.log(`User ${email} deleted from Auth0`)
+    } catch (error) {
+      throw new HttpException(`Erro ao excluir usuário: ${error.message}`, HttpStatus.BAD_REQUEST)
     }
   }
 }

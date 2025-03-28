@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { AccountRegisterService } from '@src/identity/core/services'
 import { AccountRepository } from '@src/identity/persist/repository/account.repository'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
-import { ExternalAuth0Client } from '@src/identity/http/client/integration-auth0.client'
+import { ExternalAuth0Client } from '@src/identity/http/integration/integration-auth0.client'
 import { AccountStatus } from '@src/identity/persist/entities/account.entity'
 
 import * as nock from 'nock'

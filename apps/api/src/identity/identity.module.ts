@@ -8,7 +8,9 @@ import { IdentityPersistenceModule } from './persist/persist.module'
 import { AccountController } from './http/rest/controllers'
 import { UserController } from './http/rest/controllers/user.controller'
 import { ListAccountService, AccountRegisterService, ListUserService, EditUserInfo } from './core/services'
-import { ExternalAuth0Client } from './http/client/integration-auth0.client'
+import { ExternalAuth0Client } from './http/integration/integration-auth0.client'
+import { ExternalPublicClient } from './http/client/external-public-api'
+import { PublicClientModule } from './http/client/public-client.module'
 
 
 @Module({
@@ -16,6 +18,7 @@ import { ExternalAuth0Client } from './http/client/integration-auth0.client'
 		HttpModule,
 		BrokerModule.forRoot(),
 		IdentityPersistenceModule,
+		PublicClientModule,
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],
@@ -28,9 +31,11 @@ import { ExternalAuth0Client } from './http/client/integration-auth0.client'
 	 ExternalAuth0Client,
 	 AccountRegisterService,
 	 EditUserInfo,
+	 ExternalPublicClient,
 	 ListAccountService,
 	 ListUserService,
 	],
+	exports: [ExternalPublicClient],
 	controllers: [AccountController, UserController]
 })
 export class IdentityModule {}

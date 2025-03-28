@@ -42,7 +42,7 @@ export class AccountRepository extends DefaultTypeOrmRepository<Account> {
 				status: command.status as any,
 				users: [newUser]
 			})
-		
+
 			return await this.save(newAccount)
 		} catch (error) {
 			Logger.error('Database error:', error)

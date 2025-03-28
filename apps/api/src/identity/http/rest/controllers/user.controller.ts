@@ -4,6 +4,7 @@ import { Roles } from '@src/shared/framework/decorators'
 import { RoleGuard } from '@src/shared/framework/guards'
 import { EditUserInfo, ListUserService } from '@src/identity/core/services'
 import { UserInfoResponseDto } from '../dto'
+import { User } from '@src/identity/persist/entities/user.entity'
 
 @Controller('/identity/user')
 export class UserController {
@@ -60,7 +61,7 @@ export class UserController {
 	@Patch(':userId')
 	async updateUser(
 		@Param('userId') userId: string,
-		@Body() updates: Record<string, any>
+		@Body() updates: Pick<User, 'firstName' | 'lastName'>
 	) {
 		return await this.editUserInfo.execute({ userId, updates })
 	}
