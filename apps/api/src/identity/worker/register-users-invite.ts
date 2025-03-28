@@ -15,6 +15,7 @@ export class RegisterUsersByInvite {
   })
 	async execute(message: string) {
 		try {
+			console.log('queue.register.user.invite', message)
 			const data = JSON.parse(message)
 		  await this.auth0Client.inviteUserWithPasswordSetup(data.email)
 		} catch (error) {

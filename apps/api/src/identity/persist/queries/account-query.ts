@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { DataSource } from 'typeorm'
 import { BaseQueryService } from '@src/shared/query/base-query.service'
 import { Account } from '../entities/account.entity'
+import { InjectDataSource } from '@nestjs/typeorm'
 
 
 @Injectable()
 export class AccountQueryService extends BaseQueryService<Account> {
   constructor(
-    private readonly accountRepository: Repository<Account>,
+    dataSource: DataSource
   ) {
-    super(accountRepository)
+    super(dataSource, Account)
   }
 }

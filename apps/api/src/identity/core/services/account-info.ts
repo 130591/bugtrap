@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { AccountQueryService } from '@src/identity/persist/queries'
 
 interface ListAccountInput {
-  accountId: string;
+  filters: object;
   page: number;
   limit: number;
   orderBy: string;

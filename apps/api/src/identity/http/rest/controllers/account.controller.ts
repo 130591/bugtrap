@@ -28,8 +28,8 @@ export class AccountController {
 		})
 	}
 
-	@Roles('read:users')
-  @UseGuards(RoleGuard)
+	// @Roles('read:users')
+  // @UseGuards(RoleGuard)
 	@Get(':accountId')
 	@CommonResponse({
 		isPaginated: true,
@@ -50,7 +50,7 @@ export class AccountController {
 			} = queryParams
 
 		const { count, result, nextPage } =  await this.listAccount.execute({
-      accountId,
+      filters: { id: accountId },
       page: Number(page),
       limit: Math.min(Number(limit), 20),
       orderBy,
