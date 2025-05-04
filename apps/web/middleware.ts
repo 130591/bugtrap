@@ -1,23 +1,22 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getAccessToken } from "@auth0/nextjs-auth0"
+import { NextRequest, NextResponse } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
+  const token = await getToken({ req })
+  const isAuthRoute = req.nextUrl.pathname.startsWith("/api/auth")
 
-  try {
-    const { accessToken } = await getAccessToken()
 
-    
-    if (!accessToken) {
-      return NextResponse.redirect(new URL("/api/auth/login", req.url))
-    }
-    
-    return res
-  } catch (error) {
-    return NextResponse.redirect(new URL("/api/auth/login", req.url))
+  if (isAuthRoute) {
+    return NextResponse.next()
   }
+
+  if (!token) {
+    return NextResponse.redirect(new URL("/auth/login", req.url))
+  }
+
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: [ "/profile/:path*"], // "/dashboard/:path*",
+  matcher: ["/profile/:path*"], //  "/dashboard/:path*"
 }

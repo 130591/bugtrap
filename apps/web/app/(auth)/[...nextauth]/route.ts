@@ -26,8 +26,8 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-				try {
-          const res = await fetch(`${process.env.API_URL}/auth/login`, {
+        try {
+          const res = await fetch(`${process.env.API_URL}/identity/user/signin`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -37,31 +37,34 @@ export const authOptions = {
           })
 
           if (!res.ok) {
-            throw new Error("Invalid credentials")
+            throw new Error("Credenciais inválidas")
           }
 
           const user = await res.json()
+          if (!user || !user.success || !user.data) {
+            throw new Error("Resposta inválida do servidor")
+          }
 
-          if (user) return user
-          return null
-        } catch (error) {
-          console.error("Login error:", error)
-          return null
+          return { id: user.data.userId, token: user.data.token }
+        } catch (error: any) {
+          console.error("Erro no login:", error.message)
+          throw new Error(error.message || "Erro ao autenticar")
         }
       },
     }),
   ],
+  debug: false,
   pages: {
     signIn: "/login",
   },
   callbacks: {
-    async session({ session , token }: { session: any, token: any }) {
-      session.user.id = token.sub
-      return session
+    async session({ session, token }: { session: any, token: any }) {
+      session.user.id = token.sub;
+      return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-};
+}
 
 const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }

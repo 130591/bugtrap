@@ -1,23 +1,27 @@
-import { Geist, Geist_Mono } from 'next/font/google'
+'use client'
+
+import { Inter } from 'next/font/google'
+import { Geist_Mono } from 'next/font/google'
 import './globals.css'
 import AuthProvider from './auth-provider'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-inter',
 })
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
 })
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" className={`${inter.variable} ${geistMono.variable}`}>
+      <body className="antialiased">
         <AuthProvider>
           {children}
         </AuthProvider>

@@ -19,13 +19,16 @@ export default function Login() {
     setLoading(true)
     setError("")
 
-    const res = await signIn("credentials", {
+    const res = await signIn("Credentials", {
       email,
       password,
+			method: "POST",
       redirect: false,
     });
 
     if (res?.error) {
+			alert(`Erro: ${res?.error}`)
+			console.log('res?.error', res?.error)
       setError("Email ou senha inválidos.")
       setLoading(false);
     } else {

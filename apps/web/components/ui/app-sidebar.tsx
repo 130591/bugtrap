@@ -20,7 +20,7 @@ const data = {
   navMain: [
     {
       title: 'Projects',
-      url: '#',
+      url: '/project',
       icon: <FaProjectDiagram className="w-4 h-4" />,
       isActive: false,
     },
@@ -47,8 +47,8 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-		<Sidebar className="w-56" {...props}>
-		<SidebarHeader>
+		<Sidebar className="w-56 text-white ft-2" {...props}>
+		<SidebarHeader className="!bg-[#121320]">
 			<VersionSwitcher
 				key={'yesww'}
 				tenantEmail="everton.paixao16@gmail.com"
@@ -56,19 +56,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				tenantName="fullapplabs"
 				userRole="admin"
 			/>
-			<SearchForm />
+			{/* <SearchForm /> */}
 		</SidebarHeader>
-		<SidebarContent>
+		<SidebarContent className="!bg-[#121320]">
 			{data.navMain.map((item) => (
-				<SidebarGroup key={item.title}>
-					<SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+				<SidebarGroup key={item.title} >
 					<SidebarGroupContent>
 						<SidebarMenu>
 							<SidebarMenuButton asChild isActive={item.isActive}>
 								<a
 									href={item.url}
-									className={`flex items-center gap-2 px-3 py-2 rounded-md ${
-										item.isActive ? 'bg-gray-200 font-semibold' : 'text-gray-600'
+									className={`flex items-center gap-2 px-3 py-2 rounded-md text-[12px] ${
+										item.isActive
+											? 'bg-gray-200 text-black font-semibold'
+											: 'text-white hover:bg-[#2A2B2E]'
 									}`}
 								>
 									{item.icon}
