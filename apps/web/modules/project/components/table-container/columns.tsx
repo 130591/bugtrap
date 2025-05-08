@@ -1,5 +1,5 @@
 "use client"
-
+import React, { useState } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { Task } from "./scheme"
 import { DataTableColumnHeader } from "./data-table-column-header"
@@ -8,13 +8,12 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { AvatarInitials } from "@/components/ui/avatar-internals"
 import { LabelBadge } from "@/components/ui/badge-label"
 import { CalendarDays } from "lucide-react"
-import React from "react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tabs } from "@radix-ui/react-tabs"
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
-
+import clsx from "clsx"
 
 const randomColorClasses = [
   "bg-blue-500",
@@ -23,50 +22,75 @@ const randomColorClasses = [
   "bg-teal-500", 
 ]
 
-
 export const columns: ColumnDef<Task>[] = [
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false, 
-    enableHiding: false,
-  },
-  {
-    accessorKey: "id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ID" />
-    ),
-		cell: ({ row }) => {
-			const id = row.getValue("id") as string
-			const lastFive = id.slice(-5)
-			return <div className="w-[80px] font-mono">{lastFive}</div>
-		},
+    header: ({ table }) => {
+      const [manuallyChecked, setManuallyChecked] = useState(false);
+
+      const handleCheckedChange = (value: boolean) => {
+        setManuallyChecked(value);
+        table.toggleAllPageRowsSelected(value);
+      };
+
+      return (
+        <div className="group relative">
+          <Checkbox
+            checked={manuallyChecked}
+            onCheckedChange={(value) => handleCheckedChange(!!value)}
+            aria-label="Select all"
+            className={clsx(
+              "translate-y-[2px] transition-opacity duration-200",
+              {
+                "opacity-100": manuallyChecked,
+                "opacity-0 group-hover:opacity-100": !manuallyChecked,
+              }
+            )}
+          />
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      const checked = row.getIsSelected();
+
+      return (
+        <div className="group relative">
+          <Checkbox
+            checked={checked}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+            className={clsx(
+              "translate-y-[2px] transition-opacity duration-200",
+              {
+                "opacity-100": checked,
+                "opacity-0 group-hover:opacity-100": !checked,
+              }
+            )}
+          />
+        </div>
+      );
+    },
     enableSorting: false,
     enableHiding: false,
-  },
+  },  
+  // {
+  //   accessorKey: "id",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="ID" />
+  //   ),
+	// 	cell: ({ row }) => {
+	// 		const id = row.getValue("id") as string
+	// 		const lastFive = id.slice(-5)
+	// 		return <div className="w-[80px] font-mono">{lastFive}</div>
+	// 	},
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
     accessorKey: "projectName",
     header: ({ column }) => (
 			<div className="text-[12px]">
-				<DataTableColumnHeader column={column} title="Project Name" />
+				<DataTableColumnHeader column={column} title="Name" />
 			</div>
     ),
     cell: ({ row }) => <div className="truncate text-[11px]">{row.getValue("projectName")}</div>,

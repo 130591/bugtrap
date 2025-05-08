@@ -21,7 +21,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} ${geistMono.variable}`}>
-      <body className="antialiased">
+      <body className="antialiased bg-[#FCFCFC]">
         <AuthProvider>
           {children}
         </AuthProvider>

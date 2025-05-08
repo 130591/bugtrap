@@ -66,8 +66,8 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
-  return (
-    <div className="space-y-4">
+  return ( 
+    <div className="space-y-4 bg-[#FCFCFC]">
       <div className="rounded-md border">
         <Table>
           <TableHeader className="h-2">

@@ -48,40 +48,50 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
 		<Sidebar className="w-56 text-white ft-2" {...props}>
-		<SidebarHeader className="!bg-[#121320]">
-			<VersionSwitcher
-				key={'yesww'}
-				tenantEmail="everton.paixao16@gmail.com"
-				membersCount={10}
-				tenantName="fullapplabs"
-				userRole="admin"
-			/>
-			{/* <SearchForm /> */}
-		</SidebarHeader>
-		<SidebarContent className="!bg-[#121320]">
-			{data.navMain.map((item) => (
-				<SidebarGroup key={item.title} >
-					<SidebarGroupContent>
-						<SidebarMenu>
-							<SidebarMenuButton asChild isActive={item.isActive}>
-								<a
-									href={item.url}
-									className={`flex items-center gap-2 px-3 py-2 rounded-md text-[12px] ${
-										item.isActive
-											? 'bg-gray-200 text-black font-semibold'
-											: 'text-white hover:bg-[#2A2B2E]'
-									}`}
-								>
-									{item.icon}
-									{item.title}
-								</a>
-							</SidebarMenuButton>
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
-			))}
-		</SidebarContent>
-		<SidebarRail />
-	</Sidebar>
+    <SidebarHeader className="!bg-[#121320]">
+      <VersionSwitcher
+        key="yesww"
+        tenantEmail="everton.paixao16@gmail.com"
+        membersCount={10}
+        tenantName="fullapplabs"
+        userRole="admin"
+      />
+      {/* <SearchForm /> */}
+    </SidebarHeader>
+
+    <SidebarContent className="!bg-[#121320]">
+      {data.navMain.map((item) => (
+        <SidebarGroup key={item.title}>
+          <SidebarGroupContent className="p-0 m-0">
+            <SidebarMenu className="p-0 m-0">
+              <SidebarMenuButton
+                asChild
+                isActive={item.isActive}
+                className="w-full p-0 m-0"
+              >
+                <a
+                  href={item.url}
+                  className={`
+                    w-full block 
+                    flex items-center gap-2 
+                    px-3 py-2 rounded-md text-[12px] transition-colors 
+                    ${item.isActive
+                      ? '!bg-[#1E1F2C] !text-white font-semibold'
+                      : 'hover:!bg-[#1E1F2C] !text-white'}
+                  `}
+                >
+                  {item.icon}
+                  {item.title}
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      ))}
+    </SidebarContent>
+
+    <SidebarRail />
+  </Sidebar>
+
   )
 }

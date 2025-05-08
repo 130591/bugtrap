@@ -27,7 +27,7 @@ export default function Project() {
 
 	return (
 		<Layout>
-			<div className="flex items-center justify-between mt-2 mb-1">
+			<div className="flex items-center justify-between mt-2 mb-1 bg-[#FCFCFC]">
 				<h1 className="text-lg font-semibold text-[13px] mt-4">All Projects</h1>
 
 				<div className="flex items-center gap-2 ml-auto">
@@ -45,7 +45,7 @@ export default function Project() {
 
 			<AutomationModal onClose={() => setAutomation(false)} open={showAutomation}  />
 				
-			<div className="border border-gray-200 rounded-t-2xl shadow-md">
+			<div className="border border-gray-200 rounded-t-2xl shadow-md bg-[#FCFCFC]">
 				<div className="overflow-x-auto">
 					<DataTable columns={columns} data={data}  />
 				</div>
