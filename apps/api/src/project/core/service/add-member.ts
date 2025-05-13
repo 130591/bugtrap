@@ -15,7 +15,6 @@ export class AddMemberService {
   ) {}
 
   private async ensureAllUsersExist(membersId: string[]) {
-    // this method(findUserById) needs to be reviewed, a real implementation is not available, only in memory.
     const users = await Promise.all(membersId.map(id => this.publicAPI.findUserById(id)))
     if (users.some(user => !user)) {
       throw new NotFoundException('One or more users not found')
