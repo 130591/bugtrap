@@ -3,6 +3,7 @@ import { ProjectRepository } from '@src/project/persist/repository'
 import { PaginationSpecification } from './specification/pagination-spec'
 import { SortSpecification } from './specification/sorting-spec'
 import { FilterSpecification } from './specification/filter-spec'
+import { ProjectEntity } from '../entities/project.entity'
 
 @Injectable()
 export class ProjectQueryService {

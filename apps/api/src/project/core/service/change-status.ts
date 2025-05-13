@@ -1,7 +1,7 @@
 import { ConflictException , Injectable, NotFoundException } from '@nestjs/common'
+import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { ProjectRepository } from '@src/project/persist/repository'
-import { ProjectStatus } from '../constants'
-import { PublisherService } from '@src/shared/lib/hive'
+import { ProjectStatus, StatusTransitions } from '../constants'
 
 export interface ChangeStatusCommand {
   status: ProjectStatus
@@ -10,21 +10,40 @@ export interface ChangeStatusCommand {
 
 @Injectable()
 export class ChangeStatusService {
-  constructor (private readonly repository: ProjectRepository, private readonly event: PublisherService) {}
+  constructor (
+		private readonly repository: ProjectRepository, 
+		private readonly broker: BrokerService
+	) {}
 
-  async execute(command: ChangeStatusCommand) {
-		const project = await this.repository.find({ where: { id: command.projectId } })
+	private validate (current: ProjectStatus, next: ProjectStatus) {
+		if (current === next) return false
 
-		if (!project) throw new NotFoundException(`Project with ID ${command.projectId} not found`)
-
-		if ([ProjectStatus.CANCELED, ProjectStatus.COMPLETED, ProjectStatus.ARCHIVED].includes(project.status)) {
-			throw new ConflictException(`The status can't be changed to ${command.status} at this moment`)
+		if (next === ProjectStatus.ARCHIVED || current === ProjectStatus.ARCHIVED) {
+			return true
 		}
 
-		project.status = command.status
+		return StatusTransitions[current]?.includes(next) ?? false
+	}
+
+	private applyStatusChange (project, newStatus: ProjectStatus) {
+		if (!this.validate(project.status, newStatus)) {
+      throw new ConflictException(`Cannot change from ${project.status} to ${newStatus}`)
+    }
+    project.status = newStatus
+	}
+
+  async execute(command: ChangeStatusCommand): Promise<{ status: string }> {
+		let project = await this.repository.find({ where: { id: command.projectId } })
+    if (!project) throw new NotFoundException(`Project with ID ${command.projectId} not found`)
 		
-		await this.repository.save(project)
-		this.event.emit('project.status.changed', { projectId: project.id, status: project.status })
-		return { status: project.status }
+    this.applyStatusChange(project, command.status)
+    await this.repository.save(project)
+
+    this.broker.emit('project', 'status.changed', {
+      projectId: project.id,
+      newStatus: project.status,
+    })
+
+    return { status: project.status }
 	}
 }

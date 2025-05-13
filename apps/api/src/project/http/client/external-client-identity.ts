@@ -27,19 +27,8 @@ constructor(
 ) {}
 
 async findUserById(ownerId: string): Promise<User> {
-  const users = [
-    {
-      "id": "a3b4c5d6-7e8f-9a10-bb11-cd1234abc567",
-      "first_name": "Jane",
-      "last_name": "Smith",
-      "email": "everton.paixao16@gmail.com",
-      "password_hash": "29fc9a8f2f3c69a11b9e5ab56bc6e70f                                ",
-      "account_id": "f4c2a1b6-3a92-4fa1-8979-92d9adbc70f0",
-      "created_at": new Date("2025-02-25T14:29:09.313Z")
-    }
-  ];
-  const user = users.find(u => u.id === ownerId)
-  return user || users[0]
+  const users = await this.identityClient.findUserByIdAPI(ownerId)
+  return users[0] || null
 }
 
 async findUserByEmail(email: string) {

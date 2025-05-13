@@ -3,6 +3,15 @@ import { ProjectStatus } from '@src/project/core/constants'
 import { DefaultEntity } from '@src/shared/lib/persistence/entity/default.entity'
 import { MemberEntity } from './member.entity'
 import { InvitationEntity } from './invite.entity'
+import { FavoriteEntity } from './favorites.entity'
+
+export enum ProjectPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL',
+}
+
 
 @Entity({ name: 'projects', schema: 'bugtrap' })
 export class ProjectEntity extends DefaultEntity<ProjectEntity> {
@@ -27,12 +36,25 @@ export class ProjectEntity extends DefaultEntity<ProjectEntity> {
   @Column({ type: 'uuid', nullable: false })
   owner_id: string;
 
+  @OneToMany(() => FavoriteEntity, (favorite) => favorite.project)
+  favorites: FavoriteEntity[];
+
   @Column({
     type: 'enum',
     enum: ProjectStatus,
     default: ProjectStatus.PENDING,
   })
   status: ProjectStatus;
+
+  @Column({
+    type: 'enum',
+    enum: ProjectPriority,
+    default: ProjectPriority.MEDIUM,
+  })
+  priority: ProjectPriority;
+
+  @Column({ type: 'text', array: true, default: () => 'ARRAY[]::text[]' })
+  tags: string[];
 
   @OneToMany(() => MemberEntity, (member) => member.project)
   members: MemberEntity[];

@@ -22,6 +22,7 @@ import {
   InvitationMember, 
   InvitationMemberListener
 } from './core/workers'
+import { CacheService } from '@src/shared/module/cache'
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import {
     CreateProjectListener,
     ExternalIdentityClient,
     NotificationOwner,
+    CacheService,
   ],
   controllers: [ProjectController]
 })

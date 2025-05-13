@@ -4,6 +4,7 @@ export interface CreateProjectCommand {
   beginProject: string[];
   accountId: string;
   ownerId: string;
+  priority: string
 }
 
 export interface InviteMemberCommand {

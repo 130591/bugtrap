@@ -1,4 +1,4 @@
-import { InvitationStatus } from './invitation-status';
-import { ProjectStatus } from './project-status';
+import { InvitationStatus } from './invitation-status'
+import { ForbiddenStatus, ProjectStatus, StatusTransitions } from './project-status'
 
-export { InvitationStatus, ProjectStatus }
+export { InvitationStatus, ProjectStatus, ForbiddenStatus, StatusTransitions }

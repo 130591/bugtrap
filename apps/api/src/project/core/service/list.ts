@@ -8,10 +8,6 @@ export class ListService {
 	) {}
 
 	async execute(params: any) {
-		try {
-			return await this.query.apply(params, 'project')
-		} catch (error) {
-			console.log('error:', error)
-		}
+		return await this.query.apply(params, 'project')
 	}
 }

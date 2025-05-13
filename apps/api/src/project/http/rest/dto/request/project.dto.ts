@@ -7,6 +7,7 @@ import {
   IsDateString,
 } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
+import { ProjectPriority } from '@src/project/persist/entities/project.entity';
 
 export class CreateProjectRequestDto {
   @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
@@ -20,6 +21,13 @@ export class CreateProjectRequestDto {
   @IsNotEmpty()
   @Expose()
   readonly ownerId: string
+
+
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440001' })
+  @IsUUID()
+  @IsNotEmpty()
+  @Expose()
+  userId: string
 
   @ApiProperty({ example: 'My Awesome Project' })
   @IsNotEmpty()
@@ -45,4 +53,8 @@ export class CreateProjectRequestDto {
   @IsDateString({}, { each: true })
   @Expose()
   readonly beginProject: string[]
+
+  @IsString()
+  @Expose()
+  priority: ProjectPriority
 }

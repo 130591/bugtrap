@@ -9,7 +9,7 @@ import { ProjectModule } from '@src/project/project.module'
 import { testDbClient } from '@testInfra/knex.database'
 import { Tables } from '@testInfra/tables-enum'
 import { createNestApp } from '@testInfra/test-e2e.setup'
-import { createTestFixtures } from '@testInfra/global-fixtures'
+import { createTestFixtures, TestData } from '@testInfra/global-fixtures'
 
 
 describe('ProjectController (e2e)', () => {
@@ -146,13 +146,13 @@ describe('ProjectController (e2e)', () => {
         .expect(400)
     })
 
-  // it('Should return an empty list when no projects are found', async () => {
-  //   const accountId = null
-  //   const response = await request(app.getHttpServer())
-  //     .get(`/project/accountId`)
-  //     .query({ page: 1, limit: 10, orderBy: 'createdAt', orderDirection: 'DESC' })
-  //     .expect(HttpStatus.OK)
+  it('Should return an empty list when no projects are found', async () => {
+    const accountId = null
+    const response = await request(app.getHttpServer())
+      .get(`/project/accountId`)
+      .query({ page: 1, limit: 10, orderBy: 'createdAt', orderDirection: 'DESC' })
+      .expect(HttpStatus.OK)
 
-  //   expect(response.body).toEqual([])
-  // })
+    expect(response.body).toEqual([])
+  })
 })

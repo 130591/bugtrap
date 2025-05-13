@@ -27,7 +27,7 @@ import { InviteMemberService } from '@src/project/core/service/invite-member'
 import { ConfirmInvitationService } from '@src/project/core/service/confirm-invite'
 import { ChangeStatusService } from '@src/project/core/service/change-status'
 
-@Controller('/project')
+@Controller('/api/project')
 export class ProjectController {
   constructor(
     private readonly create: CreateService,
@@ -47,7 +47,7 @@ export class ProjectController {
     @Req() _req: Request,
     @Body() data: CreateProjectRequestDto,
   ) {
-    return await this.create.perform(data)
+    return await this.create.execute(data)
   }
 
   @Roles('create:project')
@@ -93,7 +93,7 @@ export class ProjectController {
 
   @Roles('read:project')
   @UseGuards(RoleGuard)
-  @Get(':accountId')
+  @Get('')
   @CommonResponse({
     isPaginated: true,
     defaultLimit: 12,

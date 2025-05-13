@@ -38,17 +38,7 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
 	}
 
   async addMember(projectId: string, user: any, role: string): Promise<ProjectEntity> {
-    const project = await this.find({ where: { id: projectId }, relations: ['members'] });
-
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
-
-    const isMember = project.members.some(member => member.id === user.id)
-    if (isMember) {
-      throw new ConflictException('User is already a member of this project')
-    }
-
+    const project = await this.find({ where: { id: projectId }, relations: ['members'] })
     project.members.push({ ...user, role })
     return await this.save(project)
   }
