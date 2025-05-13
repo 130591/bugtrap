@@ -30,6 +30,11 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }))
   app.enableShutdownHooks()
+
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+  })
   
   const port = process.env.PORT || 3000
   await app.listen(port)

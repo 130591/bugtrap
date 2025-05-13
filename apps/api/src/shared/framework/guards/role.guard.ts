@@ -1,11 +1,14 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException, BadRequestException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { JwtAuthGuard } from './auth.guard'
+import { CacheService } from '@src/shared/module/cache'
+import { isUUID } from 'class-validator'
 import { ROLES_KEY } from '../decorators/role-decorator'
+import { JwtAuthGuard } from './auth.guard'
+
 
 @Injectable()
 export class RoleGuard extends JwtAuthGuard implements CanActivate {
-  constructor(private reflector: Reflector) {
+  constructor(private reflector: Reflector, private cache: CacheService) {
     super()
   }
 
@@ -21,8 +24,20 @@ export class RoleGuard extends JwtAuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest()
+    const accountId = request.headers['x-account-id']
     const user = request.user
 
+    if (!isUUID(accountId)) {
+      throw new BadRequestException('Invalid account ID')
+    }
+
+    const hasAccess = await this.cache.userHasAccess(user.id, accountId)
+    if (!hasAccess) {
+      throw new ForbiddenException('User does not have access to this account')
+    }
+
+    request.accountId = accountId
+  
     return roles.some(role => user.permissions?.includes(role))
   }
 }

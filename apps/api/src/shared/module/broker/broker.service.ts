@@ -7,11 +7,15 @@ export class BrokerService {
     private readonly amqpConnection: AmqpConnection,
   ) {}
 
-  async emit<T>(eventName: string, queue: string, data: T): Promise<void> {
-    if (this.amqpConnection) {
-      await this.amqpConnection.publish(eventName, queue, data)
-    } else {
-      throw new InternalServerErrorException('Redis client not initialized.')
+  async emit<T>(exchange: string, routingKey: string, data: T): Promise<void> {
+    if (!this.amqpConnection) {
+      throw new InternalServerErrorException('RabbitMQ connection not initialized.');
+    }
+
+    try {
+      await this.amqpConnection.publish(exchange, routingKey, data);
+    } catch (error) {
+      throw new InternalServerErrorException(`Failed to publish message: ${error.message}`);
     }
   }
 }

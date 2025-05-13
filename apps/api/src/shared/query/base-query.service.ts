@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
 import { PaginationSpecification } from './specification/pagination-spec';
 import { SortSpecification } from './specification/sorting-spec'
