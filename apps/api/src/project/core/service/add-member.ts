@@ -38,7 +38,7 @@ export class AddMemberService {
     const currentMemberIds = project.members.map(member => member.id)
     Membership.checkPolicies(project.status, currentMemberIds, command.membersId)
     
-    await Promise.all(
+    await Promise.allSettled(
       command.membersId.map(memberId =>
         this.repository.addMember(command.projectId, memberId, 'member')
       )

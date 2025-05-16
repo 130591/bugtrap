@@ -80,7 +80,13 @@ export class InviteMemberService {
       role: command.permissions[0] as any,
     })
 
-    await this.broker.emit('exchange.invite', InviteEvent.CREATED_INVITATION, invitation)
+    await this.broker.emit('exchange.invite', InviteEvent.CREATED_INVITATION, { 
+      token, 
+      accountId: command.accountId, 
+      projectId: command.projectId, 
+      role: command.permissions[0] 
+    })
+    
     return invitation
   }
 }
