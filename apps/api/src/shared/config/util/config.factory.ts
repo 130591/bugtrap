@@ -10,6 +10,7 @@ export const factory = (): Config => {
     base_url: process.env.BASE_URL,
     email_service: process.env.EMAIL_SERVICE,
     secret_token: process.env.SECRET_JWT,
+    refresh_secret: process.env.JWT_REFRESH_SECRET,
     broker_uri: process.env.BROKER_URI,
     redis: {
       host: process.env.REDIS_HOST,
