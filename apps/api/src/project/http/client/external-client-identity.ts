@@ -43,7 +43,7 @@ async findUserByEmail(email: string) {
     first_name: user.firstName,
     last_name: user.lastName,
     email: user.email,
-    account_id: user.account.id,
+    // account_id: user..id,
     created_at: new Date(user.createdAt)
   }
 }
@@ -66,7 +66,7 @@ async findAccountById(accountId: string): Promise<any> {
 
   async createUser(email: string) {
    try {
-    return await this.identityClient.registerUser(email) as User
+    return await this.identityClient.registerUser(email)
    } catch (error) {
     throw new ApplicationException({ 
       message: 'Something went wront qhen try to interact with identity module', 

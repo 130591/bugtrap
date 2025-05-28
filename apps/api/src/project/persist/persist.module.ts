@@ -5,7 +5,7 @@ import { ProjectQueryService } from './queries'
 import { InvitationRepository } from './repository/invitation.repository'
 import { ConfigModule } from '@src/shared/config/config.module'
 import { ConfigService } from '@src/shared/config/service/config.service'
-import { dataSourceOptionsFactory } from './typeorm-datasource'
+import { dataSourceOptionsFactory } from './typeorm-datasource.factory'
 
 @Module({
   imports: [

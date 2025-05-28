@@ -8,16 +8,18 @@ import { ProjectModule } from './project/project.module'
 import { CommonResponseInterceptor } from './shared/lib/apicommon'
 import { EmailBoxModule } from './shared/lib/emailbox'
 import { IdentityModule } from './identity/identity.module'
+import { AuthModule } from './shared/module/auth/auth.module'
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.AUTH0_SECRET,
+      secret: process.env.JWT_REFRESH_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     DiscoveryModule,
+    AuthModule,
     EmailBoxModule.forRoot({ apiKey: process.env.EMAIL_SERVICE }),
     ProjectModule,
     IdentityModule,
