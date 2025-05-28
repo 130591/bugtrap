@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios'
 import { of, throwError } from 'rxjs'
 import nock from 'nock'
 import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { ExternalAuth0Client } from "@src/identity/http/integration/integration-auth0.client"
+import { ExternalAuth0Client } from "@src/identity/integration/integration-auth0.client"
 import { ConfigService } from "@src/shared/config/service/config.service"
 import { auth0ApiUrl, createTestingModule, mockToken } from "../fixtures/integration-testing-module"
 

@@ -1,6 +1,6 @@
 import { HttpService } from "@nestjs/axios"
 import { Test, TestingModule } from "@nestjs/testing"
-import { ExternalAuth0Client } from "@src/identity/http/integration/integration-auth0.client"
+import { ExternalAuth0Client } from "@src/identity/integration/integration-auth0.client"
 import { ConfigService } from "@src/shared/config/service/config.service"
 
 export const auth0Domain = 'test-auth0.com'
