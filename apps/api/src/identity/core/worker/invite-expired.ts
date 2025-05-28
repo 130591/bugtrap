@@ -1,6 +1,6 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq'
 import { Injectable, Logger } from '@nestjs/common'
-import { ExternalAuth0Client } from '../http/integration/integration-auth0.client'
+import { ExternalAuth0Client } from '../../integration/integration-auth0.client'
 
 
 @Injectable()

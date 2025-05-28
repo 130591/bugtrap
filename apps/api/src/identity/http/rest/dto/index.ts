@@ -1,6 +1,7 @@
-import { RegisterAccountDto } from './request/register-account.dto'
+import { RegisterOrganizationAndUserDto } from './request/register-organization.dto'
 import { GetAccountResponseDto } from './response/get-response.dto'
 import { RegisterAccountResponseDto } from './response/register-account.dto'
 import { UserInfoResponseDto } from './response/user-info.dto'
+import { UserRegisterResponseDto } from './response/user-register-response.dto'
 
-export { RegisterAccountResponseDto, RegisterAccountDto, GetAccountResponseDto, UserInfoResponseDto }
+export { RegisterAccountResponseDto, RegisterOrganizationAndUserDto, GetAccountResponseDto, UserInfoResponseDto, UserRegisterResponseDto }

@@ -1,23 +1,28 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq'
 import { Injectable } from '@nestjs/common'
 import { InviteEvent } from '@src/shared/event'
-import { ExternalAuth0Client } from '../http/integration/integration-auth0.client'
 import { ApplicationException } from '@src/shared/exception/application.exception'
+import { UserRegister } from '../services'
 
 @Injectable()
 export class RegisterUsersByInvite {
-	constructor(private readonly auth0Client:ExternalAuth0Client) {}
+	constructor(private readonly userRegister: UserRegister) {}
 
 	@RabbitSubscribe({
     exchange: 'exchange.invite',
     routingKey: InviteEvent.CREATED_INVITATION,
-    queue: 'queue.register.user.invite',
+    queue: 'project.created.invitation',
   })
 	async execute(message: string) {
 		try {
-			console.log('queue.register.user.invite', message)
 			const data = JSON.parse(message)
-		  await this.auth0Client.inviteUserWithPasswordSetup(data.email)
+
+		  await this.userRegister.execute({
+				// accountId: data.accountId, 
+				password: data.password,
+				projectId: data.projectId,
+				email: data.email,
+			})
 		} catch (error) {
 			throw new ApplicationException({ message: '', suggestedHttpStatusCode: 500 })
 		}

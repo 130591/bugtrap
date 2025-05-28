@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
+import { ConflictException, HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import * as jwt from 'jsonwebtoken'
 import * as jwksClient from 'jwks-rsa'
@@ -202,6 +202,64 @@ export class ExternalAuth0Client {
       this.logger.log(`User ${email} deleted from Auth0`)
     } catch (error) {
       throw new HttpException(`Erro ao excluir usuário: ${error.message}`, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  async loginWithEmailAndPassword(email: string, password: string): Promise<string> {
+    try {
+      const url = `https://${this.auth0Domain}/oauth/token`
+  
+      const response = await firstValueFrom(
+        this.client.post(
+          url,
+          {
+            grant_type: 'password',
+            client_id: this.auth0ClientId,
+            client_secret: this.auth0ClientSecret,
+            username: email,
+            password: password,
+            audience: `https://${this.auth0Domain}/api/v2/`,
+            scope: 'openid profile email',
+            connection: 'Username-Password-Authentication',
+          },
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+      )
+  
+      return response.data.access_token
+    } catch (error) {
+      this.logger.error(`Login failed: ${error.response?.data?.error_description || error.message}`)
+      throw new HttpException(
+        `Login failed: ${error.response?.data?.error_description || error.message}`,
+        HttpStatus.UNAUTHORIZED
+      )
+    }
+  }
+
+
+  async requestPasswordReset(email: string): Promise<void> {
+    try {
+      const response = await firstValueFrom(
+        this.client.post(
+          `https://${this.auth0Domain}/dbconnections/change_password`,
+          {
+            client_id: this.auth0ClientId,
+            email: email,
+            connection: 'Username-Password-Authentication',
+          },
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+      )
+
+      if (response.status !== 200) {
+        throw new ConflictException('Erro ao tentar resetar a senha no Auth0')
+      }
+    } catch (error) {
+      throw new ConflictException('Erro ao comunicar com Auth0: ' + error.message)
     }
   }
 }

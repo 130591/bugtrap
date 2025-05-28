@@ -5,18 +5,19 @@ import { BrokerModule } from '@src/shared/module/broker/broker.module'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { ConfigModule } from '@src/shared/config/config.module'
 import { IdentityPersistenceModule } from './persist/persist.module'
-import { AccountController } from './http/rest/controllers'
+import { OrganizationController } from './http/rest/controllers'
 import { UserController } from './http/rest/controllers/user.controller'
-import { ListAccountService, AccountRegisterService, ListUserService, EditUserInfo } from './core/services'
-import { ExternalAuth0Client } from './http/integration/integration-auth0.client'
+import { ListOrganizationService, OrganizationRegisterService, ListUserService, EditUserInfo, SignIn, RefreshToken, UserRegister } from './core/services'
+import { ExternalAuth0Client } from './integration/integration-auth0.client'
 import { ExternalPublicClient } from './http/client/external-public-api'
 import { PublicClientModule } from './http/client/public-client.module'
+import { CacheService } from '@src/shared/module/cache'
 
 
 @Module({
 	imports: [
-		HttpModule,
 		BrokerModule.forRoot(),
+		HttpModule,
 		IdentityPersistenceModule,
 		PublicClientModule,
 		JwtModule.registerAsync({
@@ -28,14 +29,18 @@ import { PublicClientModule } from './http/client/public-client.module'
 		}),
 	],
 	providers: [
+	 CacheService,
 	 ExternalAuth0Client,
-	 AccountRegisterService,
+	 OrganizationRegisterService,
 	 EditUserInfo,
 	 ExternalPublicClient,
-	 ListAccountService,
+	 RefreshToken,
+	 ListOrganizationService,
 	 ListUserService,
+	 UserRegister,
+	 SignIn,
 	],
 	exports: [ExternalPublicClient],
-	controllers: [AccountController, UserController]
+	controllers: [OrganizationController, UserController]
 })
 export class IdentityModule {}
