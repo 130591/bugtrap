@@ -1,3 +1,3 @@
-import { AccountController } from './account.controller'
+import { OrganizationController } from './organization.controller'
 
-export { AccountController }
+export { OrganizationController }

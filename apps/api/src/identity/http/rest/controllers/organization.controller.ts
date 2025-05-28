@@ -2,34 +2,34 @@ import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/co
 import { CommonParam, CommonResponse, ICommonParams } from '@src/shared/lib/apicommon'
 import { Roles } from '@src/shared/framework/decorators'
 import { RoleGuard } from '@src/shared/framework/guards'
-import { AccountRegisterService } from '@src/identity/core/services/account-register'
-import { ListAccountService } from '@src/identity/core/services'
-import { GetAccountResponseDto, RegisterAccountDto, RegisterAccountResponseDto } from '../dto'
+import { OrganizationRegisterService } from '@src/identity/core/services/organization-register'
+import { ListOrganizationService } from '@src/identity/core/services'
+import { GetAccountResponseDto, RegisterOrganizationAndUserDto, RegisterAccountResponseDto } from '../dto'
 
-@Controller('/identity/account')
-export class AccountController {
+@Controller('/api/organization')
+export class OrganizationController {
 	constructor(
-		private readonly listAccount: ListAccountService,
-		private readonly registerService: AccountRegisterService
+		private readonly listOrganization: ListOrganizationService,
+		private readonly registerService: OrganizationRegisterService
 	) {}
 
-	@Roles('create:users')
+	@Roles('create:organization')
   @UseGuards(RoleGuard)
 	@Post('/register')
 	@CommonResponse({
 		type: [RegisterAccountResponseDto],
 		status: 201
 	})
-	async register(@Body() registerDto: RegisterAccountDto) {
+	async register(@Body() registerDto: RegisterOrganizationAndUserDto) {
 		await this.registerService.execute({
-			email: registerDto.email,
-			userId: registerDto.userId,
-			termsAccepted: registerDto.termsAccepted,
+			email: registerDto.organizationEmail,
+			organizationName: registerDto.organizationName,
+			portraitPhoto: registerDto.portraitImageBase64
 		})
 	}
 
-	// @Roles('read:users')
-  // @UseGuards(RoleGuard)
+	@Roles('read:users')
+  @UseGuards(RoleGuard)
 	@Get(':accountId')
 	@CommonResponse({
 		isPaginated: true,
@@ -38,9 +38,9 @@ export class AccountController {
 		isSorted: true,
 		type: [GetAccountResponseDto]
 	})
-	async infoAccount(
+	async organizationInfo(
 		@CommonParam() params: ICommonParams,
-		@Param('accountId') accountId: string,
+		@Param('organizationId') organizationId: string,
 		@Query() queryParams: any) {
 			const { 
 				page = 1,  
@@ -49,8 +49,8 @@ export class AccountController {
 				orderDirection = 'DESC' 
 			} = queryParams
 
-		const { count, result, nextPage } =  await this.listAccount.execute({
-      filters: { id: accountId },
+		const { count, result, nextPage } =  await this.listOrganization.execute({
+      filters: { id: organizationId },
       page: Number(page),
       limit: Math.min(Number(limit), 20),
       orderBy,

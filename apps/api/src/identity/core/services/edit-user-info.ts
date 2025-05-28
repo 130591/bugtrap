@@ -5,7 +5,7 @@ import { BrokerService } from '@src/shared/module/broker/broker.service'
 
 interface inputUserInfo {
 	userId: string,
-	updates: Pick<User, 'firstName' | 'lastName'>
+	updates: Pick<User, 'firstName' | 'lastName'> & { avatar: string }
 }
 
 @Injectable()
@@ -16,10 +16,10 @@ export class EditUserInfo {
 	) {}
 
 	async execute(command: inputUserInfo) {
-		const user  = await this.repository.find({ where: {  id: command.userId } })
+		const user  = await this.repository.find({ where: {  id: command.userId }, relations: ['accounts'] })
 		if (!user) throw new NotFoundException('Invitation not found or expired')
 		const updated = Object.assign(user, command.updates)
-		this.repository.save(updated)
+		await this.repository.save(updated)
 		await this.broker.emit('user', 'user.updated', updated)
 	}
 }
