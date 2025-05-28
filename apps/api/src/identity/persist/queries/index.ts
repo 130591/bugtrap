@@ -1,4 +1,4 @@
-import { AccountQueryService } from './account-query'
+import { OrganizationQueryService } from './organization-query'
 import { UserQueryService } from './user.query'
 
-export { UserQueryService, AccountQueryService }
+export { UserQueryService, OrganizationQueryService }

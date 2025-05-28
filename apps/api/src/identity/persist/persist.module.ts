@@ -3,10 +3,11 @@ import { DataSource } from 'typeorm'
 import { TypeOrmPersistenceModule } from '@src/shared/lib/persistence/typeorm-persistence.module'
 import { ConfigModule } from '@src/shared/config/config.module'
 import { ConfigService } from '@src/shared/config/service/config.service'
-import { UserRepository } from './repository'
-import getDataSource, { dataSourceOptionsFactory } from './typeorm-datasource'
-import { AccountRepository } from './repository/account.repository'
-import { AccountQueryService, UserQueryService } from './queries'
+import { TokenRepository, UserRepository } from './repository'
+import getDataSource from './typeorm-datasource'
+import { dataSourceOptionsFactory } from './typeorm-datasource.factory'
+import { OrganizationRepository } from './repository/organization.repository'
+import { OrganizationQueryService, UserQueryService } from './queries'
 import { User } from './entities/user.entity'
 
 
@@ -14,7 +15,7 @@ const USER_QUERY_PROVIDERS = [
   {
     provide: DataSource,
     useFactory: async () => {
-      const dataSource = await getDataSource()
+      const dataSource = await getDataSource
       if (!dataSource.isInitialized) {
         await dataSource.initialize()
       }
@@ -31,6 +32,26 @@ const USER_QUERY_PROVIDERS = [
   UserQueryService,
 ]
 
+const TOKEN_QUERY_PROVIDERS = [
+  {
+    provide: DataSource,
+    useFactory: async () => {
+      const dataSource = await getDataSource
+      if (!dataSource.isInitialized) {
+        await dataSource.initialize()
+      }
+      return dataSource
+    },
+  },
+  {
+    provide: 'TOKEN_REPOSITORY',
+    useFactory: async (dataSource: DataSource) => {
+      return dataSource.getRepository(TokenRepository)
+    },
+    inject: [DataSource],
+  },
+  UserQueryService,
+]
 
 @Module({
   imports: [
@@ -44,21 +65,24 @@ const USER_QUERY_PROVIDERS = [
     }),
   ],
   providers: [
-    AccountRepository,
+    OrganizationRepository,
     {
-      provide: AccountQueryService,
+      provide: OrganizationQueryService,
       useFactory: (dataSource: DataSource) => {
-        return new AccountQueryService(dataSource)
+        return new OrganizationQueryService(dataSource)
       },
       inject: [DataSource],
     },
     UserRepository,
     ...USER_QUERY_PROVIDERS,
+    TokenRepository,
+    ...TOKEN_QUERY_PROVIDERS
   ],
   exports: [
     UserRepository,
-    AccountRepository,
-    AccountQueryService,
+    TokenRepository,
+    OrganizationRepository,
+    OrganizationQueryService,
     UserQueryService,
   ],
 })

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { DataSource } from 'typeorm'
-import { InjectDataSource } from '@nestjs/typeorm'
 import { BaseQueryService } from '@src/shared/query/base-query.service'
 import { User } from '../entities/user.entity'
 

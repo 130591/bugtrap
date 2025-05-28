@@ -1,15 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { DataSource } from 'typeorm'
 import { BaseQueryService } from '@src/shared/query/base-query.service'
-import { Account } from '../entities/account.entity'
-import { InjectDataSource } from '@nestjs/typeorm'
-
+import { Organization } from '../entities/organization.entity'
 
 @Injectable()
-export class AccountQueryService extends BaseQueryService<Account> {
+export class OrganizationQueryService extends BaseQueryService<Organization> {
   constructor(
     dataSource: DataSource
   ) {
-    super(dataSource, Account)
+    super(dataSource, Organization)
   }
 }
