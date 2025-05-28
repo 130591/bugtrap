@@ -35,6 +35,7 @@ export const configSchema = z.object({
   base_url: z.string(),
   auth_config: authSchema,
   secret_token: z.string(),
+  refresh_secret: z.string(),
   port: z.coerce.number().positive().int(),
   email_service: z.string(),
   redis: redisSchema,

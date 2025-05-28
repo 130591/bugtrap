@@ -19,6 +19,7 @@ import { SortingDto } from './dto/sorting.dto'
 import { FilteringDto } from './dto/filtering.dto'
 import { StandardResponseDto } from './dto/response.dto'
 import { RESPONSE_FILTERING_INFO_KEY, RESPONSE_PAGINATION_INFO_KEY, RESPONSE_SORTING_INFO_KEY, STANDARD_RESPONSE_MESSAGE_KEY } from './response.constants'
+import { DATABASE_EXCEPTION_MESSAGES } from '@src/shared/exception/message-patterns'
 
 
 export interface ResponseModuleOptions {
@@ -182,14 +183,31 @@ export class CommonResponseInterceptor<T> implements NestInterceptor<T> {
               }
             },
             status,
-          );
+          )
         }
-
+        
+        switch (error.code) {
+          case '42703': {
+            this.logger.error(`Database Error: ${error.message}`)
+            throw new HttpException(
+              {
+                status: 'error',
+                error: {
+                  code: DATABASE_EXCEPTION_MESSAGES.Database.DBSchemaMismatch.code,
+                  message: 'An unexpected error occurred',
+                  details: [DATABASE_EXCEPTION_MESSAGES.Database.DBSchemaMismatch.message || 'Unknown error'],
+                }
+              },
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            )
+          }
+        }
+        
         throw new HttpException(
           {
             status: 'error',
             error: {
-              code: 'dd',
+              code: '500',
               message: 'An unexpected error occurred',
               details: [error.message || 'Unknown error'],
             }

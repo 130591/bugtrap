@@ -33,4 +33,13 @@ export class CacheService {
 
     return cached.accountId === accountId
   }
+
+  async isTokenRevoked(jti: string): Promise<boolean> {
+    const result = await this.client.get(`revoked-tokens:${jti}`)
+    return result !== null
+  }
+
+  async revokeToken(jti: string, ttlSeconds: number): Promise<void> {
+    await this.client.set(`revoked-tokens:${jti}`, 'revoked', 'EX', ttlSeconds)
+  }
 }
