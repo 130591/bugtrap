@@ -21,17 +21,14 @@ export class SetAuthCookiesInterceptor implements NestInterceptor {
           secure: true,
           sameSite: 'strict',
           maxAge: 15 * 60 * 1000,
-        });
+        })
 
         response.cookie('refresh_token', data.refreshToken, {
           httpOnly: true,
           secure: true,
           sameSite: 'strict',
           maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-
-        delete data.accessToken
-        delete data.refreshToken
+        })
       }),
     )
   }
