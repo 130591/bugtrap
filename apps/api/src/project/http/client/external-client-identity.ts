@@ -66,7 +66,8 @@ async findAccountById(accountId: string): Promise<any> {
 
   async createUser(email: string) {
    try {
-    return await this.identityClient.registerUser(email)
+    const userInfo =  await this.identityClient.registerUser(email)
+    return this.findUserById(userInfo.userId)
    } catch (error) {
     throw new ApplicationException({ 
       message: 'Something went wront qhen try to interact with identity module', 
