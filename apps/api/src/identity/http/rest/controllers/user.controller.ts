@@ -5,7 +5,7 @@ import { CommonParam, CommonResponse, ICommonParams } from '@src/shared/lib/apic
 import { Roles } from '@src/shared/framework/decorators'
 import { RoleGuard } from '@src/shared/framework/guards'
 import { EditUserInfo, ListUserService, SignIn, UserRegister } from '@src/identity/core/services'
-import { UserInfoResponseDto, UserRegisterResponseDto } from '../dto'
+import { AuthenticateResponseDto, UserInfoResponseDto, UserRegisterResponseDto } from '../dto'
 import { User } from '@src/identity/persist/entities/user.entity'
 import { RefreshToken } from '@src/identity/core/services/refresh-token'
 
@@ -75,19 +75,17 @@ export class UserController {
 
 	@UseInterceptors(SetAuthCookiesInterceptor)
 	@CommonResponse({
-		type: [UserInfoResponseDto],
+		type: [AuthenticateResponseDto],
 		status: 201
 	})
 	@Post('/signin')
 	async login(
 		@Body() body: { payload: { email: string, password: string } }
 	) {
-		const response = await this.signIn.execute({ 
+		return await this.signIn.execute({ 
 			email: body.payload.email, 
 			password: body.payload.password 
 		})
-		console.log('reponse', response)
-		return response
 	}
 
 	@Roles('update:users')
