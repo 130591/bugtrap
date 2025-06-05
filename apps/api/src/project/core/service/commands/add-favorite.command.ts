@@ -15,5 +15,5 @@ export class InputAddFavorite {
 
   @IsUUID()
   @IsNotEmpty()
-  accountId: string
+  organizationId: string
 }

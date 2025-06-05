@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable, UseInterceptors } from '@nestjs/common'
+import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { CreateProjectRequestDto } from '@src/project/http/rest/dto/request/project.dto'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { ExternalIdentityClient } from '@src/project/http/client/external-client-identity'
@@ -9,6 +10,7 @@ import { ProjectRules as Policy } from './policies'
 const MAX_PROJECTS_FOR_OWNER = 100
 
 @Injectable()
+@UseInterceptors(LoggingInterceptor)
 export class CreateService {
   constructor(
     private readonly repository: ProjectRepository,
@@ -24,17 +26,18 @@ export class CreateService {
   }
 
   async execute(command: CreateProjectRequestDto) {
-    const [user, owner, account] = await Promise.all([
+    try {
+      const [user, owner, organization] = await Promise.all([
       this.publicAPI.findUserById(command.userId),
       this.publicAPI.findUserById(command.ownerId),
-      this.publicAPI.findAccountById(command.accountId)
+      this.publicAPI.findOrganizationById(command.organizationId)
     ])
 
-    Policy.checkPolicies(user, account, owner, command.beginProject)
+    Policy.checkPolicies(user, organization, owner, command.beginProject)
     await this.checkOwnerCapacity(command.ownerId)
 
     const project = await this.repository.persist({
-      accountId: command.accountId,
+      organizationId: command.organizationId,
       beginProject: command.beginProject,
       description: command.description,
       ownerId: command.ownerId,
@@ -44,5 +47,8 @@ export class CreateService {
 
     await this.event.emit(ProjectEvent.CREATED, JSON.stringify(command))
     return project
+    } catch (error) {
+      console.log('service', error)
+    }
   }
 }

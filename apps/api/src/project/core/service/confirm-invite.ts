@@ -1,4 +1,5 @@
-import { NotFoundException, Injectable, ConflictException } from '@nestjs/common'
+import { NotFoundException, Injectable, ConflictException, UseInterceptors } from '@nestjs/common'
+import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { Transactional } from 'typeorm-transactional'
 import { InviteEvent } from '@src/shared/event'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
@@ -14,6 +15,7 @@ export interface ConfirmInviteDto {
 }
 
 @Injectable()
+@UseInterceptors(LoggingInterceptor)
 export class ConfirmInvitationService {
   constructor(
     private readonly event: BrokerService,

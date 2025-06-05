@@ -36,8 +36,8 @@ export class FavoriteEntity extends DefaultEntity<FavoriteEntity> {
   note?: string;
 
   @Column({ type: "uuid", nullable: true })
-  accountId?: string;
+  organizationId?: string;
 
   @Column({ type: "uuid", nullable: true })
-  projectAccountId?: string;
+  projectOrganizationtId?: string;
 }

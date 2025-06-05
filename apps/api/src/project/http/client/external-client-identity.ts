@@ -1,64 +1,71 @@
-import { Injectable, NotFoundException } from "@nestjs/common"
-import { ExternalPublicClient } from "@src/identity/http/client/external-public-api";
-import { ConfigService } from "@src/shared/config/service/config.service"
-import { ApplicationException } from "@src/shared/exception/application.exception";
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { ExternalPublicClient } from '@src/identity/http/client/external-public-api'
+import { ApplicationException } from '@src/shared/exception/application.exception'
+import { LoggerService } from '@src/shared/lib/logger'
 
 export interface ApiResponse<T extends Record<string, any>> {
   results: Array<T>
-}
-
-export interface User {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  password_hash?: string;
-  account_id: string;
-  created_at: Date;
 }
 
   
 @Injectable()
 export class ExternalIdentityClient {
 constructor(
-  private readonly configService: ConfigService,
+  private readonly logger: LoggerService,
   private readonly identityClient: ExternalPublicClient,
   // private readonly httpClient: any
 ) {}
 
-async findUserById(ownerId: string): Promise<User> {
-  const users = await this.identityClient.findUserByIdAPI(ownerId)
-  return users[0] || null
+async findUserById(ownerId: string) {
+  const user = await this.identityClient.findUserByIdAPI(ownerId)
+  user.githubUsername
+  if (!user) {
+      this.logger.error(
+      'One or more users not found in external identity system',
+      {
+        who: 'system_process',
+        where: 'AddMemberService.ensureAllUsersExist',
+        why: 'user_not_found_external_service',
+        externalSystem: 'external_identity_service',
+        notFoundUsers: ownerId
+      }
+    )
+  }
+  return user|| null
 }
 
 async findUserByEmail(email: string) {
-  const user = await this.identityClient.findUserByEmailAPI(email)
+    const user = await this.identityClient.findUserByEmailAPI(email)
 
-  if (!user) {
-    throw new NotFoundException(`User not found`);
-  }
+    if (!user) {
+      this.logger.error(
+        'User not found in external identity system',
+        {
+          who: 'system_process', // Or the actor triggering this action
+          where: 'AddUserAsOwnerService.ensureUserExists',
+          why: 'user_email_not_found_external_service',
+          externalSystem: 'external_identity_service',
+          userEmail: email,
+        }
+      )
+      throw new NotFoundException('User not exist')
+    }
 
-  return {
-    id: user.id,
-    first_name: user.firstName,
-    last_name: user.lastName,
-    email: user.email,
-    // account_id: user..id,
-    created_at: new Date(user.createdAt)
-  }
+    return user
 }
 
-async findAccountById(accountId: string): Promise<any> {
+async findOrganizationById(organizationId: string): Promise<any> {
   return await  [
       {
-        "id" : "f4c2a1b6-3a92-4fa1-8979-92d9adbc70f0",
+        "id" : "96a5898b-05fb-444e-b0b5-e7cf92b388bb",
         "account_name" : "MyCompany",
         "first_name" : "John",
         "last_name" : "Doe",
         "email" : "john.doe@mycompany.com",
         "password_hash" : "6c5db1a24c039bb83f497a8a163ee64e                                ",
         "portrait_image" : null,
-        "hourly_rate" : 45.50
+        "hourly_rate" : 45.50,
+        "organization_id": "96a5898b-05fb-444e-b0b5-e7cf92b388bb",
       }
     ]
   }

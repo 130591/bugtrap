@@ -1,4 +1,5 @@
-import { ConflictException , Injectable, NotFoundException } from '@nestjs/common'
+import { ConflictException , Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
+import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { ProjectStatus, StatusTransitions } from '../constants'
@@ -9,6 +10,7 @@ export interface ChangeStatusCommand {
 }
 
 @Injectable()
+@UseInterceptors(LoggingInterceptor)
 export class ChangeStatusService {
   constructor (
 		private readonly repository: ProjectRepository, 

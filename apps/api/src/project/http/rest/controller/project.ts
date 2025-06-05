@@ -15,6 +15,7 @@ import { RoleGuard } from '@src/shared/framework/guards'
 import { CreateService } from '@src/project/core/service/create'
 import { ListService } from '@src/project/core/service/list'
 import { 
+  AddFavoriteDto,
   ChangeStatusDto, 
   ChangeStatusResponseDto, 
   CreateProjectRequestDto, 
@@ -26,6 +27,7 @@ import {
 import { InviteMemberService } from '@src/project/core/service/invite-member'
 import { ConfirmInvitationService } from '@src/project/core/service/confirm-invite'
 import { ChangeStatusService } from '@src/project/core/service/change-status'
+import { AddFavoriteService } from '@src/project/core/service/add-favorite'
 
 @Controller('/api/project')
 export class ProjectController {
@@ -34,10 +36,11 @@ export class ProjectController {
     private readonly changeStatus: ChangeStatusService,
     private readonly confirmInvitation: ConfirmInvitationService,
     private readonly inviteMember: InviteMemberService,
+    private readonly addFavorite: AddFavoriteService,
     private readonly list: ListService) {}
 
-  @Roles('create:project')
-  @UseGuards(RoleGuard)
+  // @Roles('create:project')
+  // @UseGuards(RoleGuard)
   @Post()
   @CommonResponse({
     type: [ResponseDto],
@@ -88,6 +91,22 @@ export class ProjectController {
     return await this.changeStatus.execute({ 
       projectId: projectId , 
       status: data.status 
+    })
+  }
+
+  @Post(':projectId/add')
+  async _addFavorite( 
+    @Param('projectId') projectId: string,
+    @Body() data: AddFavoriteDto,
+    @Req() req: Request) {
+    const userId = 'req.user?.id'
+
+    return await this.addFavorite.execute({ 
+      projectId: projectId,
+      organizationId: data.organizationId,
+      context: data.context,
+      note: data.note,
+      userId: userId
     })
   }
 

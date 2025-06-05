@@ -11,6 +11,7 @@ import { ListService } from './core/service/list'
 import { CreateService } from './core/service/create'
 import { ChangeStatusService } from './core/service/change-status'
 import { InviteMemberService } from './core/service/invite-member'
+import { AddFavoriteService } from './core/service/add-favorite'
 import { ConfirmInvitationService } from './core/service/confirm-invite'
 import { NotificationOwner } from './core/workers/project/created-project.job'
 import { ExternalIdentityClient } from './http/client/external-client-identity'
@@ -56,6 +57,7 @@ import { CacheService } from '@src/shared/module/cache'
     ListService,
     ExternalPublicClient,
     ConfirmInvitationService,
+    AddFavoriteService,
     EmailBox,
     ChangeStatusService,
     CreateProjectListener,

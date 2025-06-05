@@ -31,7 +31,7 @@ export class ProjectEntity extends DefaultEntity<ProjectEntity> {
   endDate: Date;
 
   @Column({ type: 'uuid', nullable: false })
-  account_id: string;
+  organization_id: string;
 
   @Column({ type: 'uuid', nullable: false })
   owner_id: string;

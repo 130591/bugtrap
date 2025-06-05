@@ -6,7 +6,7 @@ import { InjectDataSource } from '@nestjs/typeorm'
 import { FavoriteEntity } from '../entities/favorites.entity'
 
 export interface CommandFavorite {
-	accountId: string;
+	organizationId: string;
 	projectId?: string;
 	userId: string;
 	context?: string;
@@ -30,7 +30,7 @@ export class FavoriteRepository extends DefaultTypeOrmRepository<FavoriteEntity>
 				context: command.context, 
 				note: command.note,
 				projectId: command.projectId,
-				projectAccountId: command.accountId
+				organizationId: command.organizationId,
 			})
 		
 			return await this.save(favorites)

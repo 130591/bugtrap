@@ -15,6 +15,7 @@ export interface RegisterAccountCommand {
 
 @Injectable()
 export class OrganizationRegisterService {
+	
   constructor(
     private readonly broker: BrokerService,
     private readonly repository: OrganizationRepository,

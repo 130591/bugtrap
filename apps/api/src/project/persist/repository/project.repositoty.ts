@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
@@ -43,11 +43,11 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
     return await this.save(project)
   }
 
-  async countProjectsByAccountId(accountId: string) {
+  async countProjectsByAccountId(organizationId: string) {
     try {
       const totalProjects = await this.repository.count({
         where: {
-          account_id: accountId,
+          organization_id: organizationId,
         },
       })
       return totalProjects
@@ -59,15 +59,19 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
 
   @Transactional()
   async persist(command: CreateProjectCommand) {
-    const project = new ProjectEntity({
+   try {
+     const project = new ProjectEntity({
       description: command.description,
       project_name: command.projectName,
       startDate: new Date(command.beginProject[0]),
       endDate: new Date(command.beginProject[1]),
-      account_id: command.accountId,
+      organization_id: command.organizationId,
       owner_id: command.ownerId,
     })
   
     return await this.save(project)
+   } catch (error) {
+    console.log(error)
+   }
   }
 }

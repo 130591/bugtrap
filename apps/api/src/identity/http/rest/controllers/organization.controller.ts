@@ -4,7 +4,7 @@ import { Roles } from '@src/shared/framework/decorators'
 import { RoleGuard } from '@src/shared/framework/guards'
 import { OrganizationRegisterService } from '@src/identity/core/services/organization-register'
 import { ListOrganizationService } from '@src/identity/core/services'
-import { GetAccountResponseDto, RegisterOrganizationAndUserDto, RegisterAccountResponseDto } from '../dto'
+import { GetAccountResponseDto, RegisterOrganizationAndUserDto, RegisterOrganizationResponseDto } from '../dto'
 
 @Controller('/api/organization')
 export class OrganizationController {
@@ -13,24 +13,24 @@ export class OrganizationController {
 		private readonly registerService: OrganizationRegisterService
 	) {}
 
-	@Roles('create:organization')
-  @UseGuards(RoleGuard)
+	// @Roles('create:organization')
+  // @UseGuards(RoleGuard)
 	@Post('/register')
 	@CommonResponse({
-		type: [RegisterAccountResponseDto],
+		type: [RegisterOrganizationResponseDto],
 		status: 201
 	})
 	async register(@Body() registerDto: RegisterOrganizationAndUserDto) {
-		await this.registerService.execute({
+		return await this.registerService.execute({
 			email: registerDto.organizationEmail,
 			organizationName: registerDto.organizationName,
 			portraitPhoto: registerDto.portraitImageBase64
 		})
 	}
 
-	@Roles('read:users')
-  @UseGuards(RoleGuard)
-	@Get(':accountId')
+	// @Roles('read:users')
+  // @UseGuards(RoleGuard)
+	@Get(':organizationId')
 	@CommonResponse({
 		isPaginated: true,
 		defaultLimit: 12,
@@ -45,7 +45,7 @@ export class OrganizationController {
 			const { 
 				page = 1,  
 				limit = 12, 
-				orderBy = 'createdAt', 
+				orderBy = 'createdAt',
 				orderDirection = 'DESC' 
 			} = queryParams
 

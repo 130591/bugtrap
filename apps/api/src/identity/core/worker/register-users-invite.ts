@@ -20,7 +20,7 @@ export class RegisterUsersByInvite {
 		  await this.userRegister.execute({
 				// accountId: data.accountId, 
 				password: data.password,
-				projectId: data.projectId,
+				organizationId: data.organizationId,
 				email: data.email,
 			})
 		} catch (error) {

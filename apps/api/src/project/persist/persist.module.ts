@@ -6,6 +6,7 @@ import { InvitationRepository } from './repository/invitation.repository'
 import { ConfigModule } from '@src/shared/config/config.module'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { dataSourceOptionsFactory } from './typeorm-datasource.factory'
+import { FavoriteRepository } from './repository'
 
 @Module({
   imports: [
@@ -21,12 +22,14 @@ import { dataSourceOptionsFactory } from './typeorm-datasource.factory'
   providers: [ 
     ProjectRepository,
     InvitationRepository,
-    ProjectQueryService
+    ProjectQueryService,
+    FavoriteRepository
   ],
   exports: [
     ProjectRepository,
     InvitationRepository,
-    ProjectQueryService
+    ProjectQueryService,
+    FavoriteRepository
   ],
 })
 export class ProjectPersistModule {}

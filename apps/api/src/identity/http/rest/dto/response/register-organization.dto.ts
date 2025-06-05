@@ -1,6 +1,7 @@
-import { Expose } from 'class-transformer';
-import { IsDate, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer'
+import { IsDate, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Max, Min, MinLength } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import { OrganizationStatus } from '@src/identity/persist/entities/organization.entity';
 
 class User {
   @ApiProperty({ example: 1 })
@@ -102,8 +103,32 @@ export class Account {
   deletedAt?: Date | null;
 }
 
+export class CreateOrganizationDto {
+  @IsNotEmpty({ message: 'O nome da organização não pode ser vazio.' })
+  @IsString({ message: 'O nome da organização deve ser uma string.' })
+  organizationName: string;
 
-export class RegisterAccountResponseDto {
+  @IsNotEmpty({ message: 'O e-mail não pode ser vazio.' })
+  @IsEmail({}, { message: 'O e-mail deve ser um endereço de e-mail válido.' })
+  email: string;
+
+  @IsOptional()
+  @IsEnum(OrganizationStatus, { message: 'Status de organização inválido.' })
+  status?: OrganizationStatus;
+
+  @IsOptional()
+  @IsString({ message: 'A URL da imagem de perfil deve ser uma string.' })
+  portraitImage?: string; 
+
+  @IsOptional()
+  @IsNumber({}, { message: 'A taxa horária deve ser um número.' })
+  @Min(0, { message: 'A taxa horária não pode ser negativa.' })
+  @Max(9999999.99, { message: 'A taxa horária excede o valor máximo permitido.' })
+  hourlyRate?: number;
+}
+
+
+export class RegisterOrganizationResponseDto {
   @ApiProperty({ example: 'success' })
   @IsNotEmpty()
   @IsString()
@@ -112,7 +137,7 @@ export class RegisterAccountResponseDto {
 
   @ApiProperty({ type: User })
   @Expose()
-  data: Account;
+  data: CreateOrganizationDto;
 
   @ApiProperty({ example: 'Account created successfully' })
   @IsNotEmpty()

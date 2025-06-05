@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany } from 'typeorm'
 import { DefaultEntity } from '@src/shared/lib/persistence/entity/default.entity'
-import { UserRole } from './user-roles.entity'
 import { USER_STATUS } from '@src/shared/lib/persistence/types'
+import { UserRole } from './user-roles.entity'
 import { OrganizationMember } from './organization-member'
 
 
@@ -24,6 +24,9 @@ export class User extends DefaultEntity<User> {
 
   @Column({ type: 'uuid', nullable: true, name: 'project_id' })
   projectId: string;
+
+  @Column({ type: 'uuid', nullable: true, name: 'organization_id' })
+  organizationId: string;
 
   @Column({ type: 'boolean', nullable: false, default: false, name: 'is_verified' })
   isVerified: boolean;

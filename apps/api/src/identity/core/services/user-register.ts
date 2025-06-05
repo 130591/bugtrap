@@ -39,7 +39,7 @@ export class UserRegister {
       firstName: command.firstName,
       isVerified: true, // Or 'false' if you implement an email verification flow
       passwordHash: passwordHash, 
-      projectId: command.projectId,
+      organizationId: command.organizationId,
       userStatus: 'active',
     }))
 

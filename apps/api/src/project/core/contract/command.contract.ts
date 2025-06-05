@@ -2,7 +2,7 @@ export interface CreateProjectCommand {
   description: string;
   projectName: string;
   beginProject: string[];
-  accountId: string;
+  organizationId: string;
   ownerId: string;
   priority: string
 }

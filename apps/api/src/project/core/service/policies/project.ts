@@ -1,19 +1,16 @@
 import { ForbiddenException, NotFoundException } from "@nestjs/common"
-import { User } from "@src/project/http/client/external-client-identity"
 import { DateUtils } from "@src/shared/lib/date-utils"
 
 export namespace ProjectRules {
-	export function ensureAccountExists(account: any) {
-		if (!account || !account.length) {
+	export function ensureAccountExists(organization: any) {
+		if (!organization || !organization.length) {
 			throw new NotFoundException('Account not found')
 		}
 	}
 
-	export function ensureUserBelongsToAccount(user: User, accountId: string) {
-		console.log('user.account_id', user.account_id)
-		console.log('accountId', accountId)
-		if (user.account_id !== accountId) {
-			throw new ForbiddenException(`User ${user.email} does not belong to account ${accountId}`)
+	export function ensureUserBelongsToOrganization(user: any, organizationId: string) {
+		if (user.organizationId !== organizationId) {
+			throw new ForbiddenException(`User ${user.email} does not belong to organization ${organizationId}`)
 		}
 	}
 
@@ -28,13 +25,13 @@ export namespace ProjectRules {
 	}
 
 	export function checkPolicies(
-		user: User,
-		account: any,
+		user: any,
+		organization: any,
 		owner: any,
 		beginDate: string[]
 	) {
-		ensureAccountExists(account)
-		ensureUserBelongsToAccount(user, account[0].id)
+		ensureAccountExists(organization)
+		ensureUserBelongsToOrganization(user, organization[0].id)
 		ensureOwnerExists(owner)
 		ensureValidDates(beginDate)
 	}

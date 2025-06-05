@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto'
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, UnauthorizedException, UseInterceptors } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Transactional } from 'typeorm-transactional'
+import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { TokenRepository, UserRepository } from '@src/identity/persist/repository'
@@ -9,6 +10,7 @@ import { RefreshToken as Entity } from '../../persist/entities/refresh-token.ent
 
 
 @Injectable()
+@UseInterceptors(LoggingInterceptor)
 export class RefreshToken {
   private readonly accessSecret: string;
   private readonly refreshSecret: string;

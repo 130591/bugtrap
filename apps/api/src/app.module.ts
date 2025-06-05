@@ -9,6 +9,7 @@ import { CommonResponseInterceptor } from './shared/lib/apicommon'
 import { EmailBoxModule } from './shared/lib/emailbox'
 import { IdentityModule } from './identity/identity.module'
 import { AuthModule } from './shared/module/auth/auth.module'
+import { LoggerModule } from './shared/lib/logger/logger.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthModule } from './shared/module/auth/auth.module'
       signOptions: { expiresIn: '1h' },
     }),
     ConfigModule.forRoot({ isGlobal: true }),
+    LoggerModule,
     DiscoveryModule,
     AuthModule,
     EmailBoxModule.forRoot({ apiKey: process.env.EMAIL_SERVICE }),

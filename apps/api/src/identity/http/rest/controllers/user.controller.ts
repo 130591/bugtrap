@@ -124,11 +124,12 @@ export class UserController {
 		status: 201,
 		type: [UserRegisterResponseDto]
 	})
-	async register(@Req() req: Request, @Body() payload: { email: string, password: string, firstName: string }) {
+	async register(@Req() req: Request, @Body() payload: { email: string, password: string, firstName: string, organizationId: string }) {
 		return await this.userRegister.execute({ 
 			email: payload.email, 
-			password: payload.password, 
-			firstName: payload.firstName 
+			password: payload.password,
+			firstName: payload.firstName,
+			organizationId: payload.organizationId
 		})
 	}
 }

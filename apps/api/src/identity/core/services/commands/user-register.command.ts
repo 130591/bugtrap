@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional, MinLength } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString, IsOptional, MinLength, IsUUID } from 'class-validator'
 
 export class RegisterUser {
   @IsNotEmpty({ message: 'Email é obrigatório.' })
@@ -16,5 +16,6 @@ export class RegisterUser {
 
   @IsOptional()
   @IsString()
-  projectId?: string;
+  @IsUUID()
+  organizationId?: string;
 }

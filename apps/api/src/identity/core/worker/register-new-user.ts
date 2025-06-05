@@ -31,7 +31,7 @@ export class RegisterNewUser {
 
 		  await this.userRegister.execute({
 				password: data.password,
-				projectId: data.projectId,
+				organizationId: data.organizationId,
 				email: ''
 			})
 			
