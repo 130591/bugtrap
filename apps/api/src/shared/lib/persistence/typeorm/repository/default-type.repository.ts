@@ -1,4 +1,4 @@
-import { DefaultEntity } from '@src/shared/lib/persistence/entity/default.entity';
+import { DefaultEntity } from '@src/shared/lib/persistence/typeorm/entity/default.entity';
 import {
   EntityManager,
   EntityTarget,

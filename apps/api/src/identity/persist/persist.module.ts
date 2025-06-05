@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { DataSource } from 'typeorm'
-import { TypeOrmPersistenceModule } from '@src/shared/lib/persistence/typeorm-persistence.module'
+import { TypeOrmPersistenceModule } from '@src/shared/lib/persistence/typeorm/typeorm-persistence.module'
 import { ConfigModule } from '@src/shared/config/config.module'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { TokenRepository, UserRepository } from './repository'

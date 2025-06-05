@@ -8,7 +8,7 @@ import {
   OneToMany,
 } from 'typeorm'
 import { Role } from './role.entity'
-import { DefaultEntity } from '@src/shared/lib/persistence/entity/default.entity'
+import { DefaultEntity } from '@src/shared/lib/persistence/typeorm/entity/default.entity'
 
 @Entity({ name: 'permissions' })
 export class Permission extends DefaultEntity<Permission> {

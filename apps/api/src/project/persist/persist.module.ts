@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { TypeOrmPersistenceModule } from '@src/shared/lib/persistence/typeorm-persistence.module'
+import { TypeOrmPersistenceModule } from '@src/shared/lib/persistence/typeorm/typeorm-persistence.module'
 import { ProjectRepository } from './repository/project.repositoty'
 import { ProjectQueryService } from './queries'
 import { InvitationRepository } from './repository/invitation.repository'

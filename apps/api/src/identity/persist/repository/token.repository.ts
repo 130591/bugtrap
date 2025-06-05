@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/repository/default-type.repository'
+import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/typeorm/repository/default-type.repository'
 import { RefreshToken } from '../entities/refresh-token.entity'
 import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'

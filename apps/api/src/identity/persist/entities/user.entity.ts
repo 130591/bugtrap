@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany } from 'typeorm'
-import { DefaultEntity } from '@src/shared/lib/persistence/entity/default.entity'
-import { USER_STATUS } from '@src/shared/lib/persistence/types'
+import { DefaultEntity } from '@src/shared/lib/persistence/typeorm/entity/default.entity'
+import { USER_STATUS } from '@src/shared/lib/persistence/typeorm/types'
 import { UserRole } from './user-roles.entity'
 import { OrganizationMember } from './organization-member'
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
-import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/repository/default-type.repository'
+import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/typeorm/repository/default-type.repository'
 import { UserRole } from '../entities/user-roles.entity'
 import { User } from '../entities/user.entity'
 

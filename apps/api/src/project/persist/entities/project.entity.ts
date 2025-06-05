@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany } from 'typeorm'
 import { ProjectStatus } from '@src/project/core/constants'
-import { DefaultEntity } from '@src/shared/lib/persistence/entity/default.entity'
+import { DefaultEntity } from '@src/shared/lib/persistence/typeorm/entity/default.entity'
 import { MemberEntity } from './member.entity'
 import { InvitationEntity } from './invite.entity'
 import { FavoriteEntity } from './favorites.entity'

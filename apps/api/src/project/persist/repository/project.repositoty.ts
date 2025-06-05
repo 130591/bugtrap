@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
-import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/repository/default-type.repository'
+import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/typeorm/repository/default-type.repository'
 import { ProjectEntity } from '../entities/project.entity'
 import { CreateProjectCommand } from '../../core/contract/command.contract'
 

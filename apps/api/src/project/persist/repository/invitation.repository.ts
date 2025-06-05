@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 import { DataSource } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
-import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/repository/default-type.repository'
+import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/typeorm/repository/default-type.repository'
 import { InvitationEntity } from '../entities/invite.entity'
 import { InjectDataSource } from '@nestjs/typeorm'
 

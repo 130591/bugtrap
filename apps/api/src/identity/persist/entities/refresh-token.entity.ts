@@ -6,7 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm'
-import { DefaultEntity } from '@src/shared/lib/persistence/entity/default.entity'
+import { DefaultEntity } from '@src/shared/lib/persistence/typeorm/entity/default.entity'
 import { User } from './user.entity'
 
 @Entity({ name: 'user_refresh_tokens' })

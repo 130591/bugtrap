@@ -1,4 +1,4 @@
-import { DefaultEntity } from '@src/shared/lib/persistence/entity/default.entity'
+import { DefaultEntity } from '@src/shared/lib/persistence/typeorm/entity/default.entity'
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm'
 import { MemberRole } from '@src/identity/core/constants/enums'
 import { Organization } from './organization.entity'
