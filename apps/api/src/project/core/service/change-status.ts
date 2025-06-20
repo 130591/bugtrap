@@ -1,8 +1,9 @@
-import { ConflictException , Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
+import { Injectable, UseInterceptors } from '@nestjs/common'
 import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { ProjectStatus, StatusTransitions } from '../constants'
+import { InvalidStatusTransitionException, ProjectNotFoundException } from '../exception'
 
 export interface ChangeStatusCommand {
   status: ProjectStatus
@@ -29,14 +30,14 @@ export class ChangeStatusService {
 
 	private applyStatusChange (project, newStatus: ProjectStatus) {
 		if (!this.validate(project.status, newStatus)) {
-      throw new ConflictException(`Cannot change from ${project.status} to ${newStatus}`)
+      throw new InvalidStatusTransitionException(project.status, newStatus)
     }
     project.status = newStatus
 	}
 
   async execute(command: ChangeStatusCommand): Promise<{ status: string }> {
 		let project = await this.repository.find({ where: { id: command.projectId } })
-    if (!project) throw new NotFoundException(`Project with ID ${command.projectId} not found`)
+    if (!project) throw new ProjectNotFoundException(command.projectId)
 		
     this.applyStatusChange(project, command.status)
     await this.repository.save(project)

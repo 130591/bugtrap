@@ -1,4 +1,10 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
+import { ConflictException, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
+import { 
+  FavoriteNotAllowedException, 
+  MaxFavoritesReachedException, 
+  OnlyMembersOrOwnerCanFavoriteException, 
+  ProjectNotFoundException
+} from '../exception'
 import { Transactional } from 'typeorm-transactional'
 import { LoggerService } from '@src/shared/lib/logger'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
@@ -25,14 +31,14 @@ export class AddFavoriteService {
 
   private validateFavoriteEligibility(project: ProjectEntity, userId: string): void {
     if (ForbiddenStatus.includes(project.status)) {
-      throw new ForbiddenException("Cannot favorite a finalized project")
+      throw new FavoriteNotAllowedException()
     }
 
     const isMember = project.members?.some((m) => m.user_id === userId)
     const isOwner = project.owner_id === userId
 
     if (!isMember && !isOwner) {
-      throw new ForbiddenException("Only members or the owner can favorite a project")
+      throw new OnlyMembersOrOwnerCanFavoriteException()
     }
 
     if (project.favorites.length >= MAX_FAVORITES_PER_USER) {
@@ -43,7 +49,7 @@ export class AddFavoriteService {
         project.favorites.length,
         MAX_FAVORITES_PER_USER
       )
-      throw new ForbiddenException(`You have reached the maximum of ${MAX_FAVORITES_PER_USER} favorites`)
+      throw new MaxFavoritesReachedException(MAX_FAVORITES_PER_USER)
     }
   }
 
@@ -61,7 +67,7 @@ export class AddFavoriteService {
     })
 
     if (!project) {
-      throw new NotFoundException('Project not found')
+      throw new ProjectNotFoundException(project.id)
     }
 
     this.validateFavoriteEligibility(project, command.userId)

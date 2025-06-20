@@ -1,5 +1,10 @@
-import { ConflictException, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
+import { Injectable, UseInterceptors } from '@nestjs/common'
 import { Transactional } from 'typeorm-transactional'
+import { 
+  OwnershipChangeNotAllowedException, 
+  ProjectNotFoundException, 
+  UserNotFoundException 
+} from '../exception'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { ExternalIdentityClient } from '@src/project/http/client'
@@ -34,16 +39,14 @@ export class AddUserAsOwnerService {
 
   private ensureStatusAllowsOwnershipChange(status: ProjectStatus): void {
     if (ForbiddenStatus.includes(status)) {
-      throw new ConflictException(
-        `Unable to change the owner of a project with status '${status}'`
-      )
+      throw new OwnershipChangeNotAllowedException(status)
     }
   }
 
   private async ensureUserExists(email: string): Promise<any> {
     const user = await this.identityClient.findUserByEmail(email)
     if (!user) {
-      throw new NotFoundException('User not exist')
+      throw new UserNotFoundException()
     }
     return user
   }
@@ -62,7 +65,7 @@ export class AddUserAsOwnerService {
     ])
 
     if (!project) {
-      throw new NotFoundException('Project not found')
+      throw new ProjectNotFoundException(project.id)
     }
 
     this.changeOwnership(project, user.id)

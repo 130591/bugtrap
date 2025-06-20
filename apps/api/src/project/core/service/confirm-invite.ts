@@ -1,6 +1,12 @@
-import { NotFoundException, Injectable, ConflictException, UseInterceptors } from '@nestjs/common'
+import { Injectable, UseInterceptors } from '@nestjs/common'
 import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { Transactional } from 'typeorm-transactional'
+import { 
+  InvitationAlreadyUsedException, 
+  InvitationNotFoundException, 
+  ProjectNotFoundException, 
+  UserAlreadyMemberException 
+} from '../exception'
 import { InviteEvent } from '@src/shared/event'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { ProjectRepository, InvitationRepository } from '@src/project/persist/repository'
@@ -32,10 +38,10 @@ export class ConfirmInvitationService {
     return user
   }
 
-  private async ensureProjectExists(productId: string) {
-    let project = await this.projectRepo.findOneById(productId)
+  private async ensureProjectExists(projectId: string) {
+    let project = await this.projectRepo.findOneById(projectId)
     if (!project) {
-      throw new NotFoundException('Project not found')
+      throw new ProjectNotFoundException(projectId)
     }
     return project
   }
@@ -43,7 +49,7 @@ export class ConfirmInvitationService {
   private async ensureInviteExists(token: string) {
     let invite = await  this.repository.findInviteByToken(token)
     if (!invite) {
-      throw new NotFoundException('Invitation not found')
+      throw new InvitationNotFoundException()
     }
     return invite
   }
@@ -53,13 +59,13 @@ export class ConfirmInvitationService {
     const alreadyMembers = currentMemberIds.includes(newMember)
     
     if (alreadyMembers.length > 0) {
-      throw new ConflictException('Some users are already members of the project')
+      throw new UserAlreadyMemberException()
     }
   }
 
   private markAsAccepted(invite: any) {
     if (invite.status != InvitationStatus.PENDING) {
-      throw new ConflictException('Invitation has already been used or is invalid.')
+      throw new InvitationAlreadyUsedException()
     }
     invite.status = InvitationStatus.ACCEPTED
   }

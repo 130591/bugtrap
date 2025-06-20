@@ -6,6 +6,7 @@ import { ExternalIdentityClient } from '@src/project/http/client/external-client
 import { PublisherService } from '@src/shared/lib/hive'
 import { ProjectEvent } from '@src/shared/event'
 import { ProjectRules as Policy } from './policies'
+import { OwnerProjectLimitExceededException } from '../exception'
 
 const MAX_PROJECTS_FOR_OWNER = 100
 
@@ -21,7 +22,7 @@ export class CreateService {
   private async checkOwnerCapacity(ownerId: string) {
     const actives = await this.repository.countActiveProjectsForOwner(ownerId)
     if (actives >= MAX_PROJECTS_FOR_OWNER) {
-      throw new BadRequestException('Owner cannot have more than 100 active projects')
+      throw new OwnerProjectLimitExceededException()
     }
   }
 

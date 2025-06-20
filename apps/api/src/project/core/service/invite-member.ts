@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
+import { Injectable, UseInterceptors } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { InviteEvent } from '@src/shared/event'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { DateUtils } from '@src/shared/lib/date-utils'
 import { LoggingInterceptor } from '@src/shared/framework/interceptors'
+import { GuestUserNotFoundException } from '../exception'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { InvitationEntity as Invitation } from '@src/project/persist/entities/invite.entity'
 import { InvitationRepository } from '@src/project/persist/repository/invitation.repository'
@@ -36,7 +37,7 @@ export class InviteMemberService {
       this.identity.findUserByEmail(guestEmail),
     ])
 
-    if (!guest) throw new NotFoundException(`Guest user with email ${guestEmail} not found`)
+    if (!guest) throw new GuestUserNotFoundException(guestEmail)
 
     return { project, guest }
   }

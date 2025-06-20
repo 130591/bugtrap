@@ -1,10 +1,15 @@
-import { ConflictException, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
+import { Injectable, UseInterceptors } from '@nestjs/common'
 import { Transactional } from 'typeorm-transactional'
 import { LoggerService } from '@src/shared/lib/logger'
 import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { ExternalIdentityClient } from '@src/project/http/client'
+import { 
+  FailedToAddMembersException, 
+  ProjectNotFoundException, 
+  UsersNotFoundException 
+} from '../exception'
 import { AddMemberLogs } from './logger'
 import { Membership } from './policies'
 import { InputAddMember } from './commands'
@@ -24,7 +29,7 @@ export class AddMemberService {
     const users = await Promise.all(membersId.map(id => this.publicAPI.findUserById(id)))
     
     if (users.some(user => !user)) {      
-      throw new NotFoundException('One or more users not found')
+      throw new UsersNotFoundException()
     }
     return users
   }
@@ -41,7 +46,7 @@ export class AddMemberService {
       })
     ])
 
-    if (!project) throw new NotFoundException('Project not found')
+    if (!project) throw new ProjectNotFoundException(project.id)
     
     const currentMemberIds = project.members.map(member => member.id)
     
@@ -85,7 +90,7 @@ export class AddMemberService {
         command.membersId,
         results.map((r: any) => r.reason)
       )
-      throw new ConflictException('Failed to add any members to the project.')
+      throw new FailedToAddMembersException()
     }
 
     this.event.emit('project', 'add_member', { projectId: project.id })
