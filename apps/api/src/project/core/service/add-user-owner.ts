@@ -34,8 +34,6 @@ export class AddUserAsOwnerService {
 
   private ensureStatusAllowsOwnershipChange(status: ProjectStatus): void {
     if (ForbiddenStatus.includes(status)) {
-      AddUserAsOwnerLogs.forbiddenStatusChange(this.logger, status, '')
-
       throw new ConflictException(
         `Unable to change the owner of a project with status '${status}'`
       )
@@ -56,10 +54,8 @@ export class AddUserAsOwnerService {
   }
 
   @Transactional()
-  @UseInterceptors(LoggingInterceptor)
   async execute(command: AddUserAsOwnerCommand): Promise<AddUserAsOwnerDto> {
     const requestingUserId = command.userEmail || 'system_initiator'
-
     const [user, project] = await Promise.all([
       this.ensureUserExists(command.userEmail),
       this.projectRepository.find({ where: { id: command.projectId } })

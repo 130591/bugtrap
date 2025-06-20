@@ -23,7 +23,6 @@ export class LoggingInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest<Request>()
 
     const requestingUserId = request?.user || request?.headers?.['x-user-id'] || 'system_process'
-     console.log('request', request.user)
     const correlationId = request?.headers?.['x-correlation-id'] || 'no_correlation_id'
 
     const start = Date.now()
@@ -74,6 +73,7 @@ export class LoggingInterceptor implements NestInterceptor {
             what = 'unauthorized_access_attempt'
             why = `access_forbidden: ${error.message}`
           }
+          
           this.logger.warn(
             `Failed ${className}.${methodName} with business error`,
             {

@@ -26,8 +26,7 @@ export class CreateService {
   }
 
   async execute(command: CreateProjectRequestDto) {
-    try {
-      const [user, owner, organization] = await Promise.all([
+    const [user, owner, organization] = await Promise.all([
       this.publicAPI.findUserById(command.userId),
       this.publicAPI.findUserById(command.ownerId),
       this.publicAPI.findOrganizationById(command.organizationId)
@@ -47,8 +46,5 @@ export class CreateService {
 
     await this.event.emit(ProjectEvent.CREATED, JSON.stringify(command))
     return project
-    } catch (error) {
-      console.log('service', error)
-    }
   }
 }

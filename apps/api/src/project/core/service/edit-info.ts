@@ -1,7 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { ForbiddenException, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
 import { Transactional } from 'typeorm-transactional'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
+import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { ForbiddenStatus, ProjectStatus } from '../constants'
 import { ProjectEntity } from '@src/project/persist/entities/project.entity'
 
@@ -11,6 +12,7 @@ interface InputEditInfo {
 }
 
 @Injectable()
+@UseInterceptors(LoggingInterceptor)
 export class EditInfoService {
 	constructor(
 		private readonly event: BrokerService,

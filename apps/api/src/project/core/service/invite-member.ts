@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { InviteEvent } from '@src/shared/event'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { DateUtils } from '@src/shared/lib/date-utils'
+import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { InvitationEntity as Invitation } from '@src/project/persist/entities/invite.entity'
 import { InvitationRepository } from '@src/project/persist/repository/invitation.repository'
@@ -14,6 +15,7 @@ import { Transactional } from 'typeorm-transactional'
 
 
 @Injectable()
+@UseInterceptors(LoggingInterceptor)
 export class InviteMemberService {
   private readonly secret: string;
 
@@ -28,7 +30,7 @@ export class InviteMemberService {
     this.secret = config.get('secret_token')
   }
 
-  private async loadEntities({ hostId, accountId, projectId, guestEmail }: InviteMemberCommand) {
+  private async loadEntities({ projectId, guestEmail }: InviteMemberCommand) {
     const [project, guest] = await Promise.all([
       this.projects.find({ where: { id: projectId }, relations: ['members'] }),
       this.identity.findUserByEmail(guestEmail),

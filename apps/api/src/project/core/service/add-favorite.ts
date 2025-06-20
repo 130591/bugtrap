@@ -25,7 +25,6 @@ export class AddFavoriteService {
 
   private validateFavoriteEligibility(project: ProjectEntity, userId: string): void {
     if (ForbiddenStatus.includes(project.status)) {
-      AddFavoriteLogs.forbiddenStatusFavorite(this.logger, userId, project.id, project.status)
       throw new ForbiddenException("Cannot favorite a finalized project")
     }
 
@@ -33,7 +32,6 @@ export class AddFavoriteService {
     const isOwner = project.owner_id === userId
 
     if (!isMember && !isOwner) {
-      AddFavoriteLogs.unauthorizedUserFavoriteAttempt(this.logger, userId, project.id)
       throw new ForbiddenException("Only members or the owner can favorite a project")
     }
 
@@ -63,14 +61,12 @@ export class AddFavoriteService {
     })
 
     if (!project) {
-      AddFavoriteLogs.projectNotFound(this.logger, command.userId, command.projectId)
       throw new NotFoundException('Project not found')
     }
 
     this.validateFavoriteEligibility(project, command.userId)
 
     if (this.hasBeenFavoritedByUser(project, command.userId)) {
-      AddFavoriteLogs.alreadyFavoritedByUser(this.logger, command.userId, project.id)
       throw new ConflictException('Project already favorited by this user')
     }
 
@@ -92,6 +88,5 @@ export class AddFavoriteService {
     )
 
     await this.event.emit('project', 'add.favorite', { projectId: project.id, userId: command.userId })
-    AddFavoriteLogs.favoriteEventDispatched(this.logger, project.id, command.userId)
   }
 }

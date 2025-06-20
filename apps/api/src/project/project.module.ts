@@ -5,6 +5,7 @@ import { HiveModule } from '@src/shared/lib/hive'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { BrokerModule } from '@src/shared/module/broker/broker.module'
 import { ConfigModule } from '@src/shared/config/config.module'
+import { CacheService } from '@src/shared/module/cache'
 import { ProjectPersistModule } from './persist/persist.module'
 import { ProjectController } from './http/rest/controller/project'
 import { ListService } from './core/service/list'
@@ -13,6 +14,7 @@ import { ChangeStatusService } from './core/service/change-status'
 import { InviteMemberService } from './core/service/invite-member'
 import { AddFavoriteService } from './core/service/add-favorite'
 import { ConfirmInvitationService } from './core/service/confirm-invite'
+import { SearchService } from './core/service/search'
 import { NotificationOwner } from './core/workers/project/created-project.job'
 import { ExternalIdentityClient } from './http/client/external-client-identity'
 import { ExternalPublicClient } from '@src/identity/http/client'
@@ -23,7 +25,7 @@ import {
   InvitationMember, 
   InvitationMemberListener
 } from './core/workers'
-import { CacheService } from '@src/shared/module/cache'
+
 
 @Module({
   imports: [
@@ -62,6 +64,7 @@ import { CacheService } from '@src/shared/module/cache'
     ChangeStatusService,
     CreateProjectListener,
     ExternalIdentityClient,
+    SearchService,
     NotificationOwner,
     CacheService,
   ],

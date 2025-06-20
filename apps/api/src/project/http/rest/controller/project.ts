@@ -28,6 +28,7 @@ import { InviteMemberService } from '@src/project/core/service/invite-member'
 import { ConfirmInvitationService } from '@src/project/core/service/confirm-invite'
 import { ChangeStatusService } from '@src/project/core/service/change-status'
 import { AddFavoriteService } from '@src/project/core/service/add-favorite'
+import { SearchService } from '@src/project/core/service/search'
 
 @Controller('/api/project')
 export class ProjectController {
@@ -37,10 +38,11 @@ export class ProjectController {
     private readonly confirmInvitation: ConfirmInvitationService,
     private readonly inviteMember: InviteMemberService,
     private readonly addFavorite: AddFavoriteService,
+    private readonly searchEngine: SearchService,
     private readonly list: ListService) {}
 
-  // @Roles('create:project')
-  // @UseGuards(RoleGuard)
+  @Roles('create:project')
+  @UseGuards(RoleGuard)
   @Post()
   @CommonResponse({
     type: [ResponseDto],
@@ -108,6 +110,44 @@ export class ProjectController {
       note: data.note,
       userId: userId
     })
+  }
+
+  @Roles('read:project')
+  @UseGuards(RoleGuard)
+  @Get('search')
+  @CommonResponse({
+    isPaginated: true,
+    defaultLimit: 12,
+    maxLimit: 20,
+    isSorted: true,
+    type: [GetResponseDto]
+  })
+  async search(
+    @Query('term') term: string,
+    @Query() queryParams: any,
+    @CommonParam() params: ICommonParams
+  ) {
+    const { 
+      page = 1,  
+      limit = 12, 
+      orderBy = 'createdAt',
+    } = queryParams
+
+    const { count, result, nextPage } = await this.searchEngine.execute({
+      searchTerm: term,
+      page: Number(page),
+      limit: Math.min(Number(limit), 20),
+      orderBy,
+    })
+    
+    params.setPaginationInfo({
+      count,
+      nextPage,
+      offset: Number(page),
+      limit: Math.min(Number(limit), 20),
+    })
+  
+    return result
   }
 
   @Roles('read:project')
