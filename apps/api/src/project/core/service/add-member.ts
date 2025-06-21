@@ -40,10 +40,7 @@ export class AddMemberService {
 
     const [_, project] = await Promise.all([
       this.ensureAllUsersExist(command.membersId),
-      this.projectRepository.find({
-        where: { id: command.projectId },
-        relations: ['members'],
-      })
+      this.projectRepository.getProjectAndMembers(command.projectId)
     ])
 
     if (!project) throw new ProjectNotFoundException(project.id)

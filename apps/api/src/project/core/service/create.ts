@@ -1,12 +1,13 @@
-import { BadRequestException, Injectable, UseInterceptors } from '@nestjs/common'
+import { Injectable, UseInterceptors } from '@nestjs/common'
+import { Transactional } from 'typeorm-transactional'
 import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { CreateProjectRequestDto } from '@src/project/http/rest/dto/request/project.dto'
 import { ProjectRepository } from '@src/project/persist/repository'
 import { ExternalIdentityClient } from '@src/project/http/client/external-client-identity'
 import { PublisherService } from '@src/shared/lib/hive'
 import { ProjectEvent } from '@src/shared/event'
-import { ProjectRules as Policy } from './policies'
 import { OwnerProjectLimitExceededException } from '../exception'
+import { ProjectRules as Policy } from './policies'
 
 const MAX_PROJECTS_FOR_OWNER = 100
 
@@ -26,6 +27,7 @@ export class CreateService {
     }
   }
 
+  @Transactional()
   async execute(command: CreateProjectRequestDto) {
     const [user, owner, organization] = await Promise.all([
       this.publicAPI.findUserById(command.userId),

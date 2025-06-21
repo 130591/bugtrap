@@ -22,6 +22,16 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
       .leftJoinAndSelect(`${alias}.invitations`, 'invitations')
   }
 
+  async getProjectAndMembers(projectId: string) {
+    const project = await (await this.getQueryBuilder('project'))
+      .leftJoinAndSelect('project.favorites', 'favorites')
+      .leftJoinAndSelect('project.members', 'members')
+      .setLock('pessimistic_write')
+      .where('project.id = :id', { id: projectId })
+      .getOne()
+    return project
+  }
+
   async countActiveProjectsForOwner(id: any) {
     try {
       const projects = await this.findMany({
@@ -59,7 +69,6 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
 
   @Transactional()
   async persist(command: CreateProjectCommand) {
-   try {
      const project = new ProjectEntity({
       description: command.description,
       project_name: command.projectName,
@@ -70,8 +79,5 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
     })
   
     return await this.save(project)
-   } catch (error) {
-    console.log(error)
-   }
   }
 }

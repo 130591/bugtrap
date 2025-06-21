@@ -1,4 +1,5 @@
 import { Injectable, UseInterceptors } from '@nestjs/common'
+import { Transactional } from 'typeorm-transactional'
 import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { BrokerService } from '@src/shared/module/broker/broker.service'
 import { ProjectRepository } from '@src/project/persist/repository'
@@ -35,6 +36,7 @@ export class ChangeStatusService {
     project.status = newStatus
 	}
 
+  @Transactional()
   async execute(command: ChangeStatusCommand): Promise<{ status: string }> {
 		let project = await this.repository.find({ where: { id: command.projectId } })
     if (!project) throw new ProjectNotFoundException(command.projectId)

@@ -5,8 +5,10 @@ import {
   FindManyOptions,
   FindOneOptions,
   FindOptionsWhere,
+  OptimisticLockVersionMismatchError,
   Repository,
 } from 'typeorm';
+import { ConcurrencyException } from './exceptions';
 
 export abstract class DefaultTypeOrmRepository<T extends DefaultEntity<T>> {
   protected repository: Repository<T>;
@@ -22,7 +24,14 @@ export abstract class DefaultTypeOrmRepository<T extends DefaultEntity<T>> {
   }
 
   async save(entity: T): Promise<T> {
-    return await this.repository.save(entity);
+    try {
+      return await this.repository.save(entity)
+    } catch (error) {
+      if (error instanceof OptimisticLockVersionMismatchError) {
+        throw new ConcurrencyException()
+      }
+      throw error
+    }
   }
 
   async findOneById(id: string, relations?: string[]): Promise<T | null> {

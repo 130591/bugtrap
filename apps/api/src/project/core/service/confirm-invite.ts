@@ -81,7 +81,7 @@ export class ConfirmInvitationService {
     this.ensureNotAlreadyMembers(project, user.id)
     this.markAsAccepted(invite)
 
-    await Promise.allSettled([
+    await Promise.all([
       this.projectRepo.addMember(project.id, user.id, invite.role),
       this.repository.confirmInvitation(invite)
     ])
