@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany } from 'typeorm'
+import { Column, Entity, OneToMany, VersionColumn } from 'typeorm'
 import { ProjectStatus } from '@src/project/core/constants'
 import { DefaultEntity } from '@src/shared/lib/persistence/typeorm/entity/default.entity'
 import { MemberEntity } from './member.entity'
@@ -35,6 +35,9 @@ export class ProjectEntity extends DefaultEntity<ProjectEntity> {
 
   @Column({ type: 'uuid', nullable: false })
   owner_id: string;
+
+  @VersionColumn()
+  version: number;
 
   @OneToMany(() => FavoriteEntity, (favorite) => favorite.project)
   favorites: FavoriteEntity[];

@@ -6,6 +6,7 @@ import {
   Unique,
   Column,
   JoinColumn,
+  VersionColumn,
 } from 'typeorm'
 import { DefaultEntity } from '@src/shared/lib/persistence/typeorm/entity/default.entity'
 import { ProjectEntity } from './project.entity'
@@ -31,6 +32,9 @@ export class FavoriteEntity extends DefaultEntity<FavoriteEntity> {
 
   @Column({ nullable: true })
   context?: string;
+
+  @VersionColumn()
+  version: number;
 
   @Column({ nullable: true, type: "text" })
   note?: string;

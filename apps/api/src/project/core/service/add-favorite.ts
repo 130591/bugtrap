@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common'
+import { ConflictException, Injectable, UseInterceptors } from '@nestjs/common'
 import { 
   FavoriteNotAllowedException, 
   MaxFavoritesReachedException, 
@@ -15,7 +15,6 @@ import { ProjectEntity } from '@src/project/persist/entities/project.entity'
 import { ForbiddenStatus } from '../constants'
 import { InputAddFavorite } from './commands'
 import { AddFavoriteLogs } from './logger'
-
 
 const MAX_FAVORITES_PER_USER = 20
 
@@ -61,10 +60,7 @@ export class AddFavoriteService {
 
   @Transactional()
   async execute(command: InputAddFavorite): Promise<void> {
-    const project = await this.projectRepository.find({
-      where: { id: command.projectId },
-      relations: ['favorites', 'members'],
-    })
+    const project = await this.projectRepository.getProjectAndMembers(command.projectId)
 
     if (!project) {
       throw new ProjectNotFoundException(project.id)

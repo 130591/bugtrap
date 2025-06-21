@@ -209,3 +209,88 @@ CREATE TABLE bugtrap.screenshots (
 -- bugtrap.screenshots foreign keys
 
 ALTER TABLE bugtrap.screenshots ADD CONSTRAINT screenshots_bug_id_fkey FOREIGN KEY (bug_id) REFERENCES bugtrap.bugs(bug_id);
+
+
+CREATE TABLE project_favorites (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  project_id UUID NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  context TEXT,
+  note TEXT,
+  UNIQUE(user_id, project_id)
+);
+
+-- project_favorites foreign keys
+ALTER TABLE project_favorites
+  ADD CONSTRAINT fk_project_favorites_user_id FOREIGN KEY (user_id)
+  REFERENCES bugtrap.users(id) ON DELETE CASCADE;
+
+ALTER TABLE project_favorites
+  ADD CONSTRAINT fk_project_favorites_project_id FOREIGN KEY (project_id)
+  REFERENCES bugtrap.projects(id) ON DELETE CASCADE;
+
+CREATE OR REPLACE FUNCTION check_favorite_same_account()
+RETURNS TRIGGER AS $$
+DECLARE
+  project_account UUID;
+  user_account UUID;
+BEGIN
+  SELECT account_id INTO project_account FROM projects WHERE id = NEW.project_id;
+  SELECT account_id INTO user_account FROM users WHERE id = NEW.user_id;
+
+  IF project_account IS DISTINCT FROM user_account THEN
+    RAISE EXCEPTION 'Favorite must belong to the same account as the project';
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER validate_favorite_account
+BEFORE INSERT OR UPDATE ON project_favorites
+FOR EACH ROW EXECUTE FUNCTION check_favorite_same_account();
+
+-- USER REFRESH TOKENS
+CREATE TABLE bugtrap.user_refresh_tokens (
+  id uuid PRIMARY KEY DEFAULT bugtrap.uuid_generate_v4(),
+  user_id uuid NOT NULL REFERENCES bugtrap.users(id) ON DELETE CASCADE,
+  refresh_token_hash varchar(255) NOT NULL,
+  expires_at timestamp NOT NULL,
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ROLES
+CREATE TABLE bugtrap.roles (
+  id uuid PRIMARY KEY DEFAULT bugtrap.uuid_generate_v4(),
+  name varchar(50) UNIQUE NOT NULL,
+  description text
+);
+
+-- PERMISSIONS
+CREATE TABLE bugtrap.permissions (
+  id uuid PRIMARY KEY DEFAULT bugtrap.uuid_generate_v4(),
+  name varchar(100) UNIQUE NOT NULL, -- ex: create:project
+  description text
+);
+
+-- USER_ROLES
+CREATE TABLE bugtrap.user_roles (
+  id uuid PRIMARY KEY DEFAULT bugtrap.uuid_generate_v4(),
+  user_id uuid NOT NULL REFERENCES bugtrap.users(id) ON DELETE CASCADE,
+  role_id uuid NOT NULL REFERENCES bugtrap.roles(id) ON DELETE CASCADE,
+  UNIQUE (user_id, role_id)
+);
+
+-- ROLE_PERMISSIONS
+CREATE TABLE bugtrap.role_permissions (
+  id uuid PRIMARY KEY DEFAULT bugtrap.uuid_generate_v4(),
+  role_id uuid NOT NULL REFERENCES bugtrap.roles(id) ON DELETE CASCADE,
+  permission_id uuid NOT NULL REFERENCES bugtrap.permissions(id) ON DELETE CASCADE,
+  UNIQUE (role_id, permission_id)
+);
+
+-- ÍNDICES RECOMENDADOS
+CREATE INDEX idx_user_roles_user_id ON bugtrap.user_roles(user_id);
+CREATE INDEX idx_user_refresh_tokens_user_id ON bugtrap.user_refresh_tokens(user_id);
+CREATE INDEX idx_role_permissions_role_id ON bugtrap.role_permissions(role_id);

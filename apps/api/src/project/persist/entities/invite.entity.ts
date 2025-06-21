@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, JoinColumn, VersionColumn } from 'typeorm';
 import { DefaultEntity } from '@src/shared/lib/persistence/typeorm/entity/default.entity';
 import { ProjectEntity } from './project.entity';
 
@@ -32,6 +32,9 @@ export class InvitationEntity extends DefaultEntity<InvitationEntity> {
 
   @Column({ type: 'varchar', nullable: true, default: 'pending' })
   status: 'pending' | 'accepted' | 'expired';
+
+  @VersionColumn()
+  version: number;
 
   @Column({ type: 'uuid', nullable: false })
   invited_user_id: string;
