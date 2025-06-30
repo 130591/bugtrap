@@ -28,9 +28,9 @@ export class SignIn {
     this.refreshSecret = config.get('refresh_secret')
   }
 
-  private generateAccessToken(user: { id: string; email: string }, roles: string[]) {
+  private generateAccessToken(user: { id: string; email: string, organizationId: string }, roles: string[]) {
     return this.jwt.sign(
-      { sub: user.id, email: user.email, roles },
+      { sub: user.id, email: user.email, roles, organizationId: user.organizationId },
       { secret: this.accessSecret, expiresIn: '15m' },
     )
   }
@@ -62,7 +62,7 @@ export class SignIn {
   async execute(payload: Payload) {
     const user = await this.users.findByEmail(payload.email)
     if (!user) throw new NotFoundException('User not found')
-      
+    
     const isValid = await this.compare(payload.password, user.passwordHash)
     if (!isValid) throw new UnauthorizedException('Invalid password')
 

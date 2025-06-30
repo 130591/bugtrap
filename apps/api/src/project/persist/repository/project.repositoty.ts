@@ -5,6 +5,7 @@ import { Transactional } from 'typeorm-transactional'
 import { DefaultTypeOrmRepository } from '@src/shared/lib/persistence/typeorm/repository/default-type.repository'
 import { ProjectEntity } from '../entities/project.entity'
 import { CreateProjectCommand } from '../../core/contract/command.contract'
+import { Mapper } from '@src/shared/lib/persistence/typeorm/decorators'
 
 
 @Injectable()
@@ -43,7 +44,7 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
 
       return projects.length
     } catch (error) {
-      console.log('errp', error)
+      throw error
     }
 	}
 
@@ -68,6 +69,7 @@ export class ProjectRepository extends DefaultTypeOrmRepository<ProjectEntity> {
   }
 
   @Transactional()
+  @Mapper({ to: 'entity' })
   async persist(command: CreateProjectCommand) {
      const project = new ProjectEntity({
       description: command.description,

@@ -9,6 +9,7 @@ import {
   Repository,
 } from 'typeorm';
 import { ConcurrencyException } from './exceptions';
+import { Mapper } from '../decorators';
 
 export abstract class DefaultTypeOrmRepository<T extends DefaultEntity<T>> {
   protected repository: Repository<T>;
@@ -23,6 +24,7 @@ export abstract class DefaultTypeOrmRepository<T extends DefaultEntity<T>> {
     this.repository = manager.getRepository(entity);
   }
 
+  @Mapper({ to: 'entity' })
   async save(entity: T): Promise<T> {
     try {
       return await this.repository.save(entity)
@@ -34,6 +36,7 @@ export abstract class DefaultTypeOrmRepository<T extends DefaultEntity<T>> {
     }
   }
 
+  @Mapper({ to: 'domain' })
   async findOneById(id: string, relations?: string[]): Promise<T | null> {
     return this.repository.findOne({
       where: { id } as unknown as FindOptionsWhere<T>,
@@ -41,10 +44,12 @@ export abstract class DefaultTypeOrmRepository<T extends DefaultEntity<T>> {
     });
   }
 
+  @Mapper({ to: 'domain' })
   async find(options: FindOneOptions<T>): Promise<T | null> {
     return this.repository.findOne(options);
   }
 
+  @Mapper({ to: 'domain' })
   async findMany(options: FindManyOptions<T>): Promise<T[] | null> {
     return this.repository.find(options)
   }
