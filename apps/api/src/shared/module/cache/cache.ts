@@ -23,15 +23,15 @@ export class CacheService {
     await this.client.set(key, JSON.stringify(info), { EX: ttlSeconds })
   }
 
-	async userHasAccess(userId: string, accountId: string): Promise<boolean> {
-    if (!userId || !accountId) return false
+	async userHasAccess(userId: string, organizationId: string): Promise<boolean> {
+    if (!userId || !organizationId) return false
 
     const cached = await this.getUserInfo(userId)
 
     // If there is no cache, it may throw an error or fallback to the database.
     if (!cached) return false
 
-    return cached.accountId === accountId
+    return cached.accountId === organizationId
   }
 
   async isTokenRevoked(jti: string): Promise<boolean> {

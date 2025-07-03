@@ -9,4 +9,8 @@ export class InputAddMember {
 	@IsNotEmpty()
 	@ArrayMaxSize(5)
 	membersId: string[]
+
+	@IsUUID()
+  @IsNotEmpty()
+  organizationId: string
 }

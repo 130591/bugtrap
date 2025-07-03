@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
+import helmet from 'helmet'
+import xssClean from 'xss-clean'
 import { initializeTransactionalContext, addTransactionalDataSource } from 'typeorm-transactional'
 import { DataSource } from 'typeorm'
 import { AppModule } from './app.module'
@@ -28,8 +30,33 @@ async function bootstrap() {
   addTransactionalDataSource(dataSource)
   setupSwagger(app)
 
+  app.use(xssClean())
   app.useGlobalPipes(new ValidationPipe({ transform: true }))
   app.enableShutdownHooks()
+  app.use( helmet({
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: [
+            "'self'",
+            'https://cdn.jsdelivr.net',
+            'https://*.twilio.com',
+            'https://*.sendgrid.com',
+          ],
+          connectSrc: [
+            "'self'",
+            'https://api.sendgrid.com',
+            'https://api.twilio.com',
+          ],
+          imgSrc: ["'self'", 'data:', 'https://*.twilio.com'],
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+          fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+          frameSrc: ["'none'"],
+        },
+      },
+      crossOriginEmbedderPolicy: false,
+    }))
 
   app.enableCors({
     origin: ['http://localhost:3000'],

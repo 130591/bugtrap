@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsUUID } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString, IsUUID } from 'class-validator'
 
 export class ConfirmInviteCommand {
   @IsUUID()
@@ -9,4 +9,8 @@ export class ConfirmInviteCommand {
 
   @IsString()
   token: string
+
+  @IsUUID()
+  @IsNotEmpty()
+  organizationId: string
 }

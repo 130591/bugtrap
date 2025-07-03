@@ -29,6 +29,9 @@ export class SetAuthCookiesInterceptor implements NestInterceptor {
           sameSite: 'strict',
           maxAge: 7 * 24 * 60 * 60 * 1000,
         })
+
+        const { accessToken, refreshToken, ...safeData } = data
+        return safeData
       }),
     )
   }

@@ -1,4 +1,4 @@
-import { IsUUID, IsEmail } from 'class-validator'
+import { IsUUID, IsEmail, IsNotEmpty } from 'class-validator'
 
 export class AddUserAsOwnerCommand {
   @IsUUID()
@@ -6,4 +6,8 @@ export class AddUserAsOwnerCommand {
 
   @IsEmail()
   userEmail: string
+
+  @IsUUID()
+  @IsNotEmpty()
+  organizationId: string
 }
