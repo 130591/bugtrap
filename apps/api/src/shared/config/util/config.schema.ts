@@ -28,6 +28,11 @@ export const authSchema = z.object({
   auth_audience: z.string()
 })
 
+export const posthogSchema = z.object({
+  api_key: z.string(),
+  host: z.string().optional().default('https://app.posthog.com'),
+})
+
 export const configSchema = z.object({
   env: z.string(),
   api_version: z.string(),
@@ -41,4 +46,5 @@ export const configSchema = z.object({
   redis: redisSchema,
   database: databaseSchema,
   storage: storageSchema,
+  posthog: posthogSchema,
 })

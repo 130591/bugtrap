@@ -33,6 +33,10 @@ export const factory = (): Config => {
       auth_audience: process.env.AUTH0_AUDIENCE,
       auth_client_id: process.env.AUTH0_CLIENT_ID,
       auth_client_secret: process.env.AUTH0_CLIENT_SECRET
+    },
+    posthog: {
+      api_key: process.env.POSTHOG_API_KEY,
+      host: process.env.POSTHOG_HOST,
     }
   })
 
