@@ -36,7 +36,7 @@ export class RoleGuard extends JwtAuthGuard implements CanActivate {
       throw new ForbiddenException('User without permission on this account')
     }
 
-    const tokenRevoked = await this.cache.isTokenRevoked(user.sub)
+    const tokenRevoked = await this.cache.isTokenRevoked(user.jti)
     if (tokenRevoked) {
       throw new UnauthorizedException('Expired or revoked token')
     }

@@ -73,10 +73,11 @@ export class ProjectController {
   async confirmInvite(
     @Param('projectId') projectId: string, 
     @Param('invitationId') invitationId: string,  
-    @Body() data: { guestEmail: string }
+    @Body() data: { guestEmail: string, organizationId: string }
   ) {
     return await this.confirmInvitation.execute({
       projectId: projectId, token: invitationId,
+      organizationId: data.organizationId,
       guestEmail: data.guestEmail,
     })
   }
