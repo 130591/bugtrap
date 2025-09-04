@@ -1,3 +1,3 @@
-import { CacheService } from './cache'
+import { CacheService } from './core/cache-service';
 
-export { CacheService }
+export { CacheService };

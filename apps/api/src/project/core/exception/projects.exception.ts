@@ -1,8 +1,18 @@
-import { NotFoundException, ConflictException, BadRequestException } from '@nestjs/common'
+import { ConflictException, BadRequestException } from '@nestjs/common'
+import { DomainError, ErrorCategory } from '@src/shared/framework'
 
-export class ProjectNotFoundException extends NotFoundException {
+export class ProjectNotFoundException extends DomainError {
+  readonly code = 'PROJECT_NOT_FOUND'
+  readonly statusCode = 404
+  readonly isRetryable = false
+  readonly category = ErrorCategory.VALIDATION
+
   constructor(projectId: string) {
-    super(`Project with ID '${projectId}' not found`)
+    super('Project not found', { projectId })
+  }
+
+  getPublicMessage(): string {
+    return 'Project not found'
   }
 }
 

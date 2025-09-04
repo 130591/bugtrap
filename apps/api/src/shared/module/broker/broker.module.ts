@@ -3,6 +3,7 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { ConfigModule } from '@src/shared/config/config.module'
 import { BrokerService } from './broker.service'
+import { EventPublisher } from '@src/shared/framework/events/event-publisher.service'
 
 @Module({
   imports: [ConfigModule],
@@ -16,7 +17,8 @@ export class BrokerModule {
           useFactory: async (configService: ConfigService) => ({
             exchanges: [
               { name: 'exchange.identity', type: 'topic', createExchangeIfNotExists: true }, 
-              { name: 'exchange.invite', type: 'topic', createExchangeIfNotExists: true }
+              { name: 'exchange.invite', type: 'topic', createExchangeIfNotExists: true },
+              { name: 'domain.events', type: 'topic', createExchangeIfNotExists: true }
             ],
             uri: configService.get('broker_uri') || 'amqp://localhost',
             enableControllerDiscovery: true,
@@ -24,7 +26,7 @@ export class BrokerModule {
           inject: [ConfigService],
         }),
       ],
-      providers: [BrokerService],
+      providers: [BrokerService, EventPublisher],
       exports: [BrokerService],
     }
   }

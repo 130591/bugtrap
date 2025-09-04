@@ -3,7 +3,7 @@ import { Transactional } from 'typeorm-transactional'
 import { LoggerService } from '@src/shared/lib/logger'
 import { LoggingInterceptor } from '@src/shared/framework/interceptors'
 import { ProjectRepository } from '@src/project/persist/repository'
-import { BrokerService } from '@src/shared/module/broker/broker.service'
+import { EventPublisher } from '@src/shared/framework/events/event-publisher.service'
 import { ExternalIdentityClient } from '@src/project/http/client'
 import { 
   FailedToAddMembersException, 
@@ -13,6 +13,7 @@ import {
 import { AddMemberLogs } from './logger'
 import { Membership } from './policies'
 import { InputAddMember } from './commands'
+import { MemberAddedEvent } from '../events/member-added.event'
 
 
 @Injectable()
@@ -20,7 +21,7 @@ import { InputAddMember } from './commands'
 export class AddMemberService {
   constructor(
     private readonly logger: LoggerService,
-    private readonly event: BrokerService,
+    private readonly eventPublisher: EventPublisher,
     private readonly projectRepository: ProjectRepository,
     private readonly publicAPI: ExternalIdentityClient,
   ) {}
@@ -79,6 +80,16 @@ export class AddMemberService {
         rejectedCount,
         command.membersId
       )
+
+      // Publish domain event for successful member additions
+      const event = new MemberAddedEvent(
+        project.id,
+        command.membersId,
+        requestingUserId,
+        fulfilledCount,
+        rejectedCount
+      )
+      await this.eventPublisher.publish(event)
     } else {
       AddMemberLogs.allMembersAdditionFailed(
         this.logger,
@@ -89,7 +100,5 @@ export class AddMemberService {
       )
       throw new FailedToAddMembersException()
     }
-
-    this.event.emit('project', 'add_member', { projectId: project.id })
   }
 }
