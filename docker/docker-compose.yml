@@ -3,50 +3,84 @@ version: '3.8'
 name: bugtrap
 
 services:
- api: 
-  build:
-    context: ../
-    dockerfile: docker/Dockerfile.dev
-  ports: 
-   - '3000:3000'
-  volumes:
-    - ../apps/api:/usr/src/app/bugtrap
-  depends_on:
-    - db
-    - redis
- db:
-  image: postgres:15-alpine
-  container_name: bugtrap-db
-  environment:
-    - POSTGRES_USER=postgres
-    - POSTGRES_PASSWORD=postgres
-  ports:
-    - '5432:5432'
-  volumes:
-    - .data:/var/lib/postgresql/data
-    - ../scripts/db/dump-db.sql:/docker-entrypoint-initdb.d/dump-db.sql
- redis:
-  image: redis:latest
-  container_name: redis-container
-  ports:
-    - "6379:6379"
-  networks:
-    - redis-network
-  restart: unless-stopped
- localstack:
-  container_name: infra
-  image: localstack/localstack
-  ports:
-   - "127.0.0.1:4566:4566"
-  environment:
-   - DEBUG=${DEBUG:-0}
-   - SERVICES=s3,sqs,sns,lambda,apigateway,sts,iam,cloudwatch,ses
-   - DEFAULT_REGION=us-east-1
-   - AWS_ACCESS_KEY_ID=test
-   - AWS_SECRET_ACCESS_KEY=test
-  volumes:
-   - "${VOLUME_DIR:-./volume}:/var/lib/localstack"
-   - "/var/run/docker.sock:/var/run/docker.sock"
-networks:
-  redis-network:
-    driver: bridge
+#  api: 
+#   build:
+#     context: ../
+#     dockerfile: docker/Dockerfile.dev
+#   ports: 
+#    - '3000:3000'
+#   volumes:
+#     - ../apps/api:/usr/src/app/bugtrap
+#   depends_on:
+#     - db
+#     - redis
+  db:
+    image: postgres:15-alpine
+    container_name: bugtrap-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - .data:/var/lib/postgresql/data
+      # - ../scripts/db/dump-db.sql:/docker-entrypoint-initdb.d/dump-db.sql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: >
+      redis-server 
+      --appendonly yes 
+      --appendfsync everysec
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    environment:
+      - REDIS_PASSWORD=your_secure_password
+    networks:
+      - cache_network
+
+  redis-sentinel:
+    image: redis:7-alpine
+    ports:
+      - "26379:26379"
+    depends_on:
+      - redis
+    command: >
+      redis-sentinel /etc/redis/sentinel.conf
+    volumes:
+      - ./redis/sentinel.conf:/etc/redis/sentinel.conf
+    networks:
+      - cache_network
+
+  localstack:
+    container_name: infra
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"
+    environment:
+      - DEBUG=${DEBUG:-0}
+      - SERVICES=s3,sqs,sns,sts,iam,ses
+      - DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    volumes:
+      - "${VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  broker:
+    image: rabbitmq:3-management
+    container_name: broker
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:
+  redis_data:
