@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq'
 import { DomainEvent } from './domain-event.base'
 
@@ -6,7 +6,7 @@ import { DomainEvent } from './domain-event.base'
 export class EventPublisher {
   constructor(
     private readonly amqpConnection: AmqpConnection,
-    private readonly logger: LoggerService,
+    private readonly logger: Logger,
   ) {}
 
   async publish(event: DomainEvent, routingKey?: string): Promise<void> {

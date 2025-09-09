@@ -5,7 +5,7 @@ import { HiveModule } from '@src/shared/lib/hive'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { BrokerModule } from '@src/shared/module/broker/broker.module'
 import { ConfigModule } from '@src/shared/config/config.module'
-import { CacheService } from '@src/shared/module/cache'
+import { CacheModule } from '@src/shared/module/cache/cache.module'
 import { ProjectPersistModule } from './persist/persist.module'
 import { ProjectController } from './http/rest/controller/project'
 import { ListService } from './core/service/list'
@@ -39,6 +39,7 @@ import {
         secret: configService.get('secret_token')
       })
     }),
+    CacheModule,
     HiveModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
@@ -66,7 +67,6 @@ import {
     ExternalIdentityClient,
     SearchService,
     NotificationOwner,
-    CacheService,
   ],
   controllers: [ProjectController]
 })

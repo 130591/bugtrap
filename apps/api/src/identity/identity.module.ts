@@ -11,12 +11,13 @@ import { ListOrganizationService, OrganizationRegisterService, ListUserService, 
 import { ExternalAuth0Client } from './integration/integration-auth0.client'
 import { ExternalPublicClient } from './http/client/external-public-api'
 import { PublicClientModule } from './http/client/public-client.module'
-import { CacheService } from '@src/shared/module/cache'
+import { CacheModule } from '@src/shared/module/cache/cache.module'
 
 
 @Module({
 	imports: [
 		BrokerModule.forRoot(),
+		CacheModule,
 		HttpModule,
 		IdentityPersistenceModule,
 		PublicClientModule,
@@ -29,7 +30,6 @@ import { CacheService } from '@src/shared/module/cache'
 		}),
 	],
 	providers: [
-	 CacheService,
 	 ExternalAuth0Client,
 	 OrganizationRegisterService,
 	 EditUserInfo,
