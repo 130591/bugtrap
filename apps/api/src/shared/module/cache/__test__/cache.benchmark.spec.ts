@@ -1,180 +1,160 @@
 import { CacheService } from '../core/cache-service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import Redis from 'ioredis';
-;
-describe('Cache Performance Tests', () => {;
+
+describe('Cache Performance Tests', () => {
   let cacheService: CacheService;
   let redis: Redis;
-;
-  beforeAll(async () => {;
+
+  beforeAll(async () => {
     // Setup similar ao integration test;
     redis = new Redis(process.env.REDIS_URL_TEST || 'redis://localhost:6379/15');
     const eventEmitter = new EventEmitter2();
     cacheService = new CacheService(redis, eventEmitter);
-    await redis.flushdb();
-  });
-;
-  afterAll(async () => {;
-    await redis.flushdb();
-    await redis.disconnect();
-  });
-;
-  describe('Single Operations Performance', () => {;
-    it('should perform single get operations within acceptable time', async () => {;
-      const testData = { id: 1, data: 'x'.repeat(1000) }; // 1KB de dados;
-      await cacheService.set('perf:single', testData);
-;
-      const start = Date.now();
-      const iterations = 1000;
-;
-      for (let i = 0; i < iterations; i++) {;
-        await cacheService.get('perf:single');
-      };
-;
-      const duration = Date.now() - start;
-      const avgTime = duration / iterations;
-;
+    await redis.flushdb()
+  })
+
+  afterAll(async () => {
+    await redis.flushdb()
+    await redis.disconnect()
+  })
+
+  describe('Single Operations Performance', () => {
+    it('should perform single get operations within acceptable time', async () => {
+      const testData = { id: 1, data: 'x'.repeat(1000) }// 1KB de dados
+      await cacheService.set('perf:single', testData)
+
+      const start = Date.now()
+      const iterations = 1000
+      for (let i = 0; i < iterations; i++) {
+        await cacheService.get('perf:single')
+      }
+      const duration = Date.now() - start
+      const avgTime = duration / iterations
+
       console.log(`Single GET: ${avgTime.toFixed(2)}ms avg, ${iterations} ops in ${duration}ms`);
-      expect(avgTime).toBeLessThan(10); // < 10ms por operação;
-    });
-;
-    it('should perform single set operations efficiently', async () => {;
-      const testData = { id: 1, data: 'x'.repeat(1000) };
-      const start = Date.now();
-      const iterations = 100; // Menos iterações para SET (mais custoso);
-;
-      for (let i = 0; i < iterations; i++) {;
-        await cacheService.set(`perf:set:${i}`, { ...testData, iteration: i });
-      };
-;
-      const duration = Date.now() - start;
-      const avgTime = duration / iterations;
-;
+      expect(avgTime).toBeLessThan(10) // < 10ms por operação
+    })
+
+    it('should perform single set operations efficiently', async () => {
+      const testData = { id: 1, data: 'x'.repeat(1000) }
+      const start = Date.now()
+      const iterations = 100 // Menos iterações para SET (mais custoso)
+
+      for (let i = 0; i < iterations; i++) {
+        await cacheService.set(`perf:set:${i}`, { ...testData, iteration: i })
+      }
+
+      const duration = Date.now() - start
+      const avgTime = duration / iterations
+
       console.log(`Single SET: ${avgTime.toFixed(2)}ms avg, ${iterations} ops in ${duration}ms`);
-      expect(avgTime).toBeLessThan(50); // < 50ms por operação;
-    });
-  });
-;
-  describe('Batch Operations Performance', () => {;
-    it('should outperform individual operations in batch', async () => {;
-      const batchSize = 100;
-      const testEntries: Array<[string, any, any]> = Array.from({ length: batchSize }, (_, i) => [;
-        `batch:${i}`,;
-        { id: i, data: `data-${i}` },;
-        { ttl: 60 };
-      ]);
-;
-      // Teste batch operation;
-      const batchStart = Date.now();
-      await cacheService.setMany(testEntries);
-      const batchDuration = Date.now() - batchStart;
-;
-      // Teste operações individuais;
-      const individualStart = Date.now();
-      for (let i = 0; i < batchSize; i++) {;
-        await cacheService.set(`individual:${i}`, { id: i, data: `data-${i}` });
-      };
-      const individualDuration = Date.now() - individualStart;
-;
-      console.log(`Batch SET: ${batchDuration}ms for ${batchSize} items`);
-      console.log(`Individual SET: ${individualDuration}ms for ${batchSize} items`);
-      console.log(`Improvement: ${(individualDuration / batchDuration).toFixed(2)}x faster`);
-;
-      expect(batchDuration).toBeLessThan(individualDuration);
-    });
-;
-    it('should efficiently retrieve multiple keys', async () => {;
-      const batchSize = 50;
-      ;
-      // Popula cache;
-      for (let i = 0; i < batchSize; i++) {;
-        await cacheService.set(`multi:${i}`, { id: i, value: `value-${i}` });
-      };
-;
-      const keys = Array.from({ length: batchSize }, (_, i) => `multi:${i}`);
-;
-      const start = Date.now();
-      const results = await cacheService.getMany(keys);
-      const duration = Date.now() - start;
-;
-      console.log(`Batch GET: ${duration}ms for ${batchSize} keys`);
-      expect(results.size).toBe(batchSize);
-      expect(duration).toBeLessThan(100); // < 100ms para 50 keys;
-    });
-  });
-;
-  describe('Lock Performance Under Load', () => {;
-    it('should handle high concurrency with minimal lock contention', async () => {;
-      const concurrency = 20;
-      let factoryCallCount = 0;
-;
-      const expensiveFactory = async () => {;
-        factoryCallCount++;
-        await new Promise(resolve => setTimeout(resolve, 200)); // Operação custosa;
-        return { computed: true, timestamp: Date.now(), callCount: factoryCallCount };
-      };
-;
-      const start = Date.now();
-      ;
-      const promises = Array.from({ length: concurrency }, async (_, i) => {;
-        return cacheService.getOrSet(`load:test:${i % 3}`, expensiveFactory, { ttl: 60 });
-      });
-;
-      const results = await Promise.all(promises);
-      const duration = Date.now() - start;
-;
-      console.log(`Concurrency test: ${duration}ms for ${concurrency} operations`);
-      console.log(`Factory calls: ${factoryCallCount} (expected: ~3 for 3 unique keys)`);
-;
+      expect(avgTime).toBeLessThan(50) // < 50ms por operação
+    })
+  })
+
+  describe('Batch Operations Performance', () => {
+    it('should outperform individual operations in batch', async () => {
+      const batchSize = 100
+      const testEntries: Array<[string, any, any]> = Array.from({ length: batchSize }, (_, i) => [
+        `batch:${i}`,
+        { id: i, data: `data-${i}` },
+        { ttl: 60 }
+      ])
+
+      const batchStart = Date.now()
+      await cacheService.setMany(testEntries)
+      const batchDuration = Date.now() - batchStart
+
+      const individualStart = Date.now()
+      for (let i = 0; i < batchSize; i++) {
+        await cacheService.set(`individual:${i}`, { id: i, data: `data-${i}` })
+      }
+      const individualDuration = Date.now() - individualStart
+      console.log(`Batch SET: ${batchDuration}ms for ${batchSize} items`)
+      console.log(`Individual SET: ${individualDuration}ms for ${batchSize} items`)
+      console.log(`Improvement: ${(individualDuration / batchDuration).toFixed(2)}x faster`)
+      expect(batchDuration).toBeLessThan(individualDuration)
+    })
+
+    it('should efficiently retrieve multiple keys', async () => {
+      const batchSize = 50
+      for (let i = 0; i < batchSize; i++) {
+        await cacheService.set(`multi:${i}`, { id: i, value: `value-${i}` })
+      }
+      const keys = Array.from({ length: batchSize }, (_, i) => `multi:${i}`)
+      const start = Date.now()
+      const results = await cacheService.getMany(keys)
+      const duration = Date.now() - start
+
+      console.log(`Batch GET: ${duration}ms for ${batchSize} keys`)
+      expect(results.size).toBe(batchSize)
+      expect(duration).toBeLessThan(100) // < 100ms para 50 keys
+    })
+  })
+
+  describe('Lock Performance Under Load', () => {
+    it('should handle high concurrency with minimal lock contention', async () => {
+      const concurrency = 20
+      let factoryCallCount = 0
+
+      const expensiveFactory = async () => {
+        factoryCallCount++
+        await new Promise(resolve => setTimeout(resolve, 200)) // Operação custosa
+        return { computed: true, timestamp: Date.now(), callCount: factoryCallCount }
+      }
+      const start = Date.now()
+      const promises = Array.from({ length: concurrency }, async (_, i) => {
+        return cacheService.getOrSet(`load:test:${i % 3}`, expensiveFactory, { ttl: 60 })
+      })
+      const results = await Promise.all(promises)
+      const duration = Date.now() - start
+
+      console.log(`Concurrency test: ${duration}ms for ${concurrency} operations`)
+      console.log(`Factory calls: ${factoryCallCount} (expected: ~3 for 3 unique keys)`)
+
       // Deve haver no máximo 3 chamadas de factory (3 keys únicas);
-      expect(factoryCallCount).toBeLessThanOrEqual(5); // Margem para race conditions;
-      expect(duration).toBeLessThan(1000); // < 1s total;
-    });
-  });
-;
-  describe('Memory and Storage Efficiency', () => {;
-    it('should efficiently store large datasets', async () => {;
-      const largeData = {;
-        id: 1,;
-        content: 'x'.repeat(10000), // 10KB;
-        array: Array.from({ length: 1000 }, (_, i) => ({ id: i, value: `item-${i}` })),;
-      };
-;
-      const start = Date.now();
-      await cacheService.set('large:dataset', largeData);
-      const setDuration = Date.now() - start;
-;
-      const getStart = Date.now();
-      const retrieved = await cacheService.get('large:dataset');
-      const getDuration = Date.now() - getStart;
-;
-      console.log(`Large data SET: ${setDuration}ms`);
-      console.log(`Large data GET: ${getDuration}ms`);
-;
-      expect(retrieved).toEqual(largeData);
-      expect(setDuration).toBeLessThan(100);
-      expect(getDuration).toBeLessThan(50);
-    });
-;
-    it('should handle cache statistics efficiently', async () => {;
-      // Popula cache com dados variados;
-      for (let i = 0; i < 50; i++) {;
-        await cacheService.set(`stats:${i}`, { ;
-          id: i, ;
-          data: 'x'.repeat(100 * (i + 1)) // Tamanhos variados;
-        });
-      };
-;
-      const start = Date.now();
-      const stats = await cacheService.getStats();
-      const duration = Date.now() - start;
-;
+      expect(factoryCallCount).toBeLessThanOrEqual(5) // Margem para race conditions
+      expect(duration).toBeLessThan(1000) // < 1s total
+    })
+  })
+
+  describe('Memory and Storage Efficiency', () => {
+    it('should efficiently store large datasets', async () => {
+      const largeData = {
+        id: 1,
+        content: 'x'.repeat(10000), // 10KB
+        array: Array.from({ length: 1000 }, (_, i) => ({ id: i, value: `item-${i}` })),
+      }
+      const start = Date.now()
+      await cacheService.set('large:dataset', largeData)
+      const setDuration = Date.now() - start
+      const getStart = Date.now()
+      const retrieved = await cacheService.get('large:dataset')
+      const getDuration = Date.now() - getStart
+      console.log(`Large data SET: ${setDuration}ms`)
+      console.log(`Large data GET: ${getDuration}ms`)
+      expect(retrieved).toEqual(largeData)
+      expect(setDuration).toBeLessThan(100)
+      expect(getDuration).toBeLessThan(50)
+    })
+
+    it('should handle cache statistics efficiently', async () => {
+      // Popula cache com dados variados
+      for (let i = 0; i < 50; i++) {
+        await cacheService.set(`stats:${i}`, { id: i, data: `value-${i}` })
+      }
+
+      const start = Date.now()
+      const stats = await cacheService.getStats()
+      const duration = Date.now() - start
+
       console.log(`Stats collection: ${duration}ms`);
       console.log(`Redis DB size: ${stats.redis.dbSize}`);
-      console.log(`Local version map: ${stats.local.versionMapSize}`);
-;
+      console.log(`Local version map: ${stats.local.versionMapSize}`)
+
       expect(duration).toBeLessThan(100);
       expect(stats.local.versionMapSize).toBeGreaterThan(0);
-    });
-  });
-});
+    })
+  })
+})

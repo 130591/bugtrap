@@ -1,39 +1,39 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { Redis } from 'ioredis';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common'
+import { Redis } from 'ioredis'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
-export interface CacheOptions {;
-  ttl?: number
-  tags?: string[]
-  version?: string
-  skipEventualConsistency?: boolean
+export interface CacheOptions {
+  ttl?: number;
+  tags?: string[];
+  version?: string;
+  skipEventualConsistency?: boolean;
 }
 
-export interface CacheMetadata {;
-  createdAt: number
-  expiresAt: number
-  version: string
-  tags: string[]
-  checksum: string
+export interface CacheMetadata {
+  createdAt: number;
+  expiresAt: number;
+  version: string;
+  tags: string;
+  checksum: string;
 }
 
 @Injectable()
-export class CacheService implements OnModuleDestroy {;
-  private readonly logger = new Logger(CacheService.name)
-  private readonly subscriber: Redis
-  private readonly publisher: Redis
-  private readonly pendingInvalidations = new Set<string>()
-  private readonly versionMap = new Map<string, string>()
+export class CacheService implements OnModuleDestroy {
+  private readonly logger = new Logger(CacheService.name);
+  private readonly subscriber: Redis;
+  private readonly publisher: Redis;
+  private readonly pendingInvalidations = new Set<string>();
+  private readonly versionMap = new Map<string, string>();
 
-  constructor(;
+  constructor(
     private readonly redis: Redis,
     private readonly eventEmitter: EventEmitter2,
   ) {
     // Separate Redis for pub/sub (official recommendation)
-    this.subscriber = redis.duplicate()
-    this.publisher = redis.duplicate()
+    this.subscriber = redis.duplicate();
+    this.publisher = redis.duplicate();
     
-    this.setupEventualConsistency()
+    this.setupEventualConsistency();
   }
 
   /**
@@ -41,46 +41,46 @@ export class CacheService implements OnModuleDestroy {;
    */
   async get<T>(key: string): Promise<T | null> {
     try {
-      const pipeline = this.redis.pipeline();
+      const pipeline = this.redis.pipeline()
       pipeline.hgetall(`${key}:meta`)
       pipeline.get(key)
       
       const results = await pipeline.exec();
-      const [metaResult, valueResult] = results;
+      const [metaResult, valueResult] = results
 
       if (!metaResult[1] || !valueResult[1]) {
-        return null;
+        return null
       }
 
-      const metadata = metaResult[1] as any;
-      const value = valueResult[1] as string;
+      const metadata = metaResult[1] as any
+      const value = valueResult[1] as string
 
       // Check expiration
       if (Date.now() > parseInt(metadata.expiresAt)) {
-        await this.delete(key);
-        return null;
+        await this.delete(key)
+        return null
       }
 
       // Check eventual consistency
       if (!this.isEventuallyConsistent(key, metadata)) {
         this.logger.warn(`Eventual consistency check failed for key: ${key}`)
-        await this.delete(key);
-        return null;
+        await this.delete(key)
+        return null
       }
 
       // Check data integrity
       const expectedChecksum = this.generateChecksum(value);
       if (metadata.checksum !== expectedChecksum) {
         this.logger.error(`Data integrity check failed for key: ${key}`)
-        await this.delete(key);
-        return null;
+        await this.delete(key)
+        return null
       }
 
       this.logger.debug(`Cache hit for key: ${key}`)
-      return JSON.parse(value) as T;
+      return JSON.parse(value) as T
     } catch (error) {
       this.logger.error(`Error getting cache for key: ${key}`, error)
-      return null;
+      return null
     }
   }
 
@@ -91,17 +91,17 @@ export class CacheService implements OnModuleDestroy {;
     const { ttl = 300, tags = [], version, skipEventualConsistency = false } = options;
     
     try {
-      const now = Date.now();
-      const expiresAt = now + (ttl * 1000);
-      const serializedValue = JSON.stringify(value);
-      const checksum = this.generateChecksum(serializedValue);
-      const cacheVersion = version || this.generateVersion(key);
+      const now = Date.now()
+      const expiresAt = now + (ttl * 1000)
+      const serializedValue = JSON.stringify(value)
+      const checksum = this.generateChecksum(serializedValue)
+      const cacheVersion = version || this.generateVersion(key)
 
-      const metadata: CacheMetadata = {;
+      const metadata: CacheMetadata = {
         createdAt: now,
         expiresAt,
         version: cacheVersion,
-        tags,
+        tags: tags.join(','),
         checksum,
       }
 
@@ -109,37 +109,37 @@ export class CacheService implements OnModuleDestroy {;
       const pipeline = this.redis.pipeline();
       
       // Store the value
-      pipeline.setex(key, ttl, serializedValue)
+      pipeline.setex(key, ttl, serializedValue);
       
       // Store metadata
-      pipeline.hmset(`${key}:meta`, metadata)
-      pipeline.expire(`${key}:meta`, ttl)
+      pipeline.hmset(`${key}:meta`, metadata);
+      pipeline.expire(`${key}:meta`, ttl);
       
       // Index by tags for batch invalidation
       if (tags.length > 0) {
         tags.forEach(tag => {
-          pipeline.sadd(`tag:${tag}`, key)
-          pipeline.expire(`tag:${tag}`, ttl)
-        })
+          pipeline.sadd(`tag:${tag}`, key);
+          pipeline.expire(`tag:${tag}`, ttl);
+        });
       }
 
       // Store version for consistency control
-      pipeline.hset('cache:versions', key, cacheVersion)
+      pipeline.hset('cache:versions', key, cacheVersion);
 
       await pipeline.exec();
 
       // Update local version map
-      this.versionMap.set(key, cacheVersion)
+      this.versionMap.set(key, cacheVersion);
 
       // Publish change event for eventual consistency
       if (!skipEventualConsistency) {
         await this.publishCacheChange(key, 'SET', { version: cacheVersion, tags });
       }
 
-      this.logger.debug(`Cache set for key: ${key}, TTL: ${ttl}s, version: ${cacheVersion}`)
+      this.logger.debug(`Cache set for key: ${key}, TTL: ${ttl}s, version: ${cacheVersion}`);
     } catch (error) {
       this.logger.error(`Error setting cache for key: ${key}`, error)
-      throw error;
+      throw error
     }
   }
 
@@ -148,16 +148,15 @@ export class CacheService implements OnModuleDestroy {;
    */
   async delete(key: string): Promise<void> {
     try {
-      const metadata = await this.redis.hgetall(`${key}:meta`);
+      const metadata = await this.redis.hgetall(`${key}:meta`)
       
-      const pipeline = this.redis.pipeline();
+      const pipeline = this.redis.pipeline()
       pipeline.del(key)
       pipeline.del(`${key}:meta`)
       pipeline.hdel('cache:versions', key)
 
-      // Remove from tags
       if (metadata.tags) {
-        const tags = metadata.tags.split(',');
+        const tags = metadata.tags.split(',')
         tags.forEach(tag => {
           if (tag.trim()) {
             pipeline.srem(`tag:${tag.trim()}`, key)
@@ -165,18 +164,16 @@ export class CacheService implements OnModuleDestroy {;
         })
       }
 
-      await pipeline.exec();
+      await pipeline.exec()
 
-      // Remove from local map
       this.versionMap.delete(key)
 
-      // Publish invalidation
-      await this.publishCacheChange(key, 'DELETE', { tags: metadata.tags?.split(',') || [] });
+      await this.publishCacheChange(key, 'DELETE', { tags: metadata.tags?.split(',') || [] })
 
       this.logger.debug(`Cache deleted for key: ${key}`)
     } catch (error) {
       this.logger.error(`Error deleting cache for key: ${key}`, error)
-      throw error;
+      throw error
     }
   }
 
@@ -190,20 +187,18 @@ export class CacheService implements OnModuleDestroy {;
       // Get all keys associated with tags
       for (const tag of tags) {
         const tagKeys = await this.redis.smembers(`tag:${tag}`);
-        tagKeys.forEach(key => keys.add(key))
+        tagKeys.forEach(key => keys.add(key));
       }
 
-      // Remove all found keys
       if (keys.size > 0) {
         await Promise.all(Array.from(keys).map(key => this.delete(key)));
-        this.logger.debug(`Invalidated ${keys.size} keys by tags: ${tags.join(', ')}`)
+        this.logger.debug(`Invalidated ${keys.size} keys by tags: ${tags.join(', ')}`);
       }
 
-      // Publish tag invalidation event
       await this.publishCacheChange('*', 'INVALIDATE_TAGS', { tags });
     } catch (error) {
       this.logger.error(`Error invalidating by tags: ${tags.join(', ')}`, error)
-      throw error;
+      throw error
     }
   }
 
@@ -215,47 +210,38 @@ export class CacheService implements OnModuleDestroy {;
     factory: () => Promise<T> | T,
     options: CacheOptions = {},
   ): Promise<T> {
-    // First try to get from cache
     const cached = await this.get<T>(key);
     if (cached !== null) {
       return cached;
     }
 
-    // Distributed lock to prevent thundering herd
     const lockKey = `lock:${key}`;
     const lockValue = `${Date.now()}-${Math.random()}`;
-    const lockTtl = 30 // 30 seconds;
+    const lockTtl = 30
 
     try {
-      // Try to acquire lock
-      const lockAcquired = await this.redis.set(lockKey, lockValue, 'PX', lockTtl * 1000, 'NX');
+      const lockAcquired = await this.redis.set(lockKey, lockValue, 'PX', lockTtl * 1000, 'NX')
       
       if (!lockAcquired) {
-        // If couldn't get lock, wait a bit and try again
-        await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 100));
+        await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 100))
         
-        // Try to get from cache again (maybe another process generated it)
         const cachedAfterWait = await this.get<T>(key);
         if (cachedAfterWait !== null) {
           return cachedAfterWait;
         }
 
-        // If still doesn't exist, generate without lock (fallback)
         this.logger.warn(`Lock acquisition failed for key: ${key}, proceeding without lock`)
       }
 
-      // Generate value
-      const value = await factory();
+      const value = await factory()
       
-      // Store in cache
-      await this.set(key, value, options);
+      await this.set(key, value, options)
       
-      return value;
+      return value
     } catch (error) {
       this.logger.error(`Error in getOrSet for key: ${key}`, error)
-      throw error;
+      throw error
     } finally {
-      // Release lock if it was acquired by this process
       try {
         const currentLock = await this.redis.get(lockKey);
         if (currentLock === lockValue) {
@@ -275,24 +261,23 @@ export class CacheService implements OnModuleDestroy {;
     factory: () => Promise<T> | T,
     options: CacheOptions & { refreshThreshold?: number } = {},
   ): Promise<T> {
-    const { refreshThreshold = 0.8, ttl = 300 } = options;
+    const { refreshThreshold = 0.8, ttl = 300 } = options
 
     const cached = await this.get<T>(key);
     
     if (cached !== null) {
-      // Check if preventive refresh is needed
-      const metadata = await this.redis.hgetall(`${key}:meta`);
+      const metadata = await this.redis.hgetall(`${key}:meta`)
       if (metadata.createdAt && metadata.expiresAt) {
-        const age = Date.now() - parseInt(metadata.createdAt);
-        const lifetime = parseInt(metadata.expiresAt) - parseInt(metadata.createdAt);
-        const ageRatio = age / lifetime;
+        const age = Date.now() - parseInt(metadata.createdAt)
+        const lifetime = parseInt(metadata.expiresAt) - parseInt(metadata.createdAt)
+        const ageRatio = age / lifetime
 
         if (ageRatio >= refreshThreshold) {
           // Asynchronous refresh to maintain performance
           setImmediate(async () => {
             try {
-              const newValue = await factory();
-              await this.set(key, newValue, options);
+              const newValue = await factory()
+              await this.set(key, newValue, options)
               this.logger.debug(`Background refresh completed for key: ${key}`)
             } catch (error) {
               this.logger.error(`Background refresh failed for key: ${key}`, error)
@@ -314,20 +299,20 @@ export class CacheService implements OnModuleDestroy {;
   async forceSync(key: string): Promise<boolean> {
     try {
       // Get version from central server
-      const serverVersion = await this.redis.hget('cache:versions', key);
-      const localVersion = this.versionMap.get(key);
+      const serverVersion = await this.redis.hget('cache:versions', key)
+      const localVersion = this.versionMap.get(key)
 
       if (serverVersion && serverVersion !== localVersion) {
         // Different versions, remove local cache to force regeneration
-        await this.delete(key);
+        await this.delete(key)
         this.logger.debug(`Forced sync completed for key: ${key}`)
-        return true;
+        return true
       }
 
-      return false;
+      return false
     } catch (error) {
       this.logger.error(`Error in force sync for key: ${key}`, error)
-      return false;
+      return false
     }
   }
 
@@ -335,20 +320,20 @@ export class CacheService implements OnModuleDestroy {;
    * Smart invalidation with propagation
    */
   async smartInvalidate(pattern: string, options: { cascade?: boolean; delay?: number } = {}): Promise<void> {
-    const { cascade = true, delay = 0 } = options;
+    const { cascade = true, delay = 0 } = options
 
     try {
       if (delay > 0) {
         // Delayed invalidation to allow propagation
         setTimeout(async () => {
-          await this.performInvalidation(pattern, cascade);
+          await this.performInvalidation(pattern, cascade)
         }, delay)
       } else {
-        await this.performInvalidation(pattern, cascade);
+        await this.performInvalidation(pattern, cascade)
       }
     } catch (error) {
       this.logger.error(`Error in smart invalidate for pattern: ${pattern}`, error)
-      throw error;
+      throw error
     }
   }
 
@@ -360,11 +345,11 @@ export class CacheService implements OnModuleDestroy {;
     local: any
     consistency: any
   }> {
-    const info = await this.redis.info('memory');
-    const dbSize = await this.redis.dbsize();
+    const info = await this.redis.info('memory')
+    const dbSize = await this.redis.dbsize()
     const versions = await this.redis.hgetall('cache:versions');
 
-    return {;
+    return {
       redis: {
         memory: info,
         dbSize,
@@ -395,11 +380,11 @@ export class CacheService implements OnModuleDestroy {;
       this.versionMap.clear()
       this.pendingInvalidations.clear()
       
-      await this.publisher.publish('cache:invalidation', JSON.stringify({;
+      await this.publisher.publish('cache:invalidation', JSON.stringify({
         pattern: '*',
         clearAll: true,
         timestamp: Date.now(),
-      }))
+      }));
 
       this.logger.warn('Cache completely cleared')
     } catch (error) {
@@ -456,7 +441,7 @@ export class CacheService implements OnModuleDestroy {;
    * Publish changes to other nodes
    */
   private async publishCacheChange(key: string, operation: string, data: any): Promise<void> {
-    const event = {;
+    const event = {
       key,
       operation,
       timestamp: Date.now(),
@@ -505,15 +490,15 @@ export class CacheService implements OnModuleDestroy {;
    * Process invalidation events
    */
   private async handleInvalidationEvent(event: any): Promise<void> {
-    const { keys, pattern, tags } = event;
+    const { keys, pattern, tags } = event
 
     if (keys) {
-      await Promise.all(keys.map(key => this.delete(key)));
+      await Promise.all(keys.map(key => this.delete(key)))
     } else if (pattern) {
-      const matchingKeys = await this.redis.keys(pattern);
-      await Promise.all(matchingKeys.map(key => this.delete(key)));
+      const matchingKeys = await this.redis.keys(pattern)
+      await Promise.all(matchingKeys.map(key => this.delete(key)))
     } else if (tags) {
-      await this.invalidateByTags(tags);
+      await this.invalidateByTags(tags)
     }
   }
 
@@ -536,23 +521,23 @@ export class CacheService implements OnModuleDestroy {;
       }
 
       // Delete keys
-      await Promise.all(keys.map(key => this.delete(key)));
+      await Promise.all(keys.map(key => this.delete(key)))
 
       // Cascade invalidate by tags
       if (allTags.size > 0) {
-        await this.invalidateByTags(Array.from(allTags));
+        await this.invalidateByTags(Array.from(allTags))
       }
     } else {
       await Promise.all(keys.map(key => this.delete(key)));
     }
 
     // Publish invalidation
-    await this.publisher.publish('cache:invalidation', JSON.stringify({;
+    await this.publisher.publish('cache:invalidation', JSON.stringify({
       pattern,
       keys,
       cascade,
       timestamp: Date.now(),
-    }))
+    }));
   }
 
   /**

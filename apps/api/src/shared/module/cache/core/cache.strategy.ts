@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CacheService } from './cache-service';
 
-export enum ConsistencyStrategy {;
+export enum ConsistencyStrategy {
   STRONG = 'strong',
   EVENTUAL = 'eventual',
   WEAK = 'weak',
 }
 
-export interface StrategyConfig {;
+export interface StrategyConfig {
   strategy: ConsistencyStrategy;
   syncInterval?: number;
   toleranceMs?: number;
@@ -15,10 +15,10 @@ export interface StrategyConfig {;
 }
 
 @Injectable()
-export class CacheConsistencyManager {;
+export class CacheConsistencyManager {
   private strategies = new Map<string, StrategyConfig>();
 
-  constructor(private readonly cacheService: CacheService) {};
+  constructor(private readonly cacheService: CacheService) {}
 
   setStrategy(keyPattern: string, config: StrategyConfig): void {
     this.strategies.set(keyPattern, config)
@@ -28,7 +28,7 @@ export class CacheConsistencyManager {;
     const strategy = this.findMatchingStrategy(key);
     
     if (!strategy) {
-      return true // No strategy = allow;
+      return true; // No strategy = allow
     }
 
     switch (strategy.strategy) {
@@ -37,7 +37,7 @@ export class CacheConsistencyManager {;
       case ConsistencyStrategy.EVENTUAL:
         return this.checkEventualConsistency(key, strategy.toleranceMs || 5000);
       case ConsistencyStrategy.WEAK:
-        return true // Always allow;
+        return true; // Always allow
       default:
         return true;
     }

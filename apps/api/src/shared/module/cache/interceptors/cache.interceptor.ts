@@ -1,16 +1,16 @@
-import {;
+import {
   Injectable,
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-} from '@nestjs/common'
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { CacheService } from '../core/cache-service';
 
 @Injectable()
-export class ConsistentCacheInterceptor implements NestInterceptor {;
-  constructor(private readonly cacheService: CacheService) {};
+export class ConsistentCacheInterceptor implements NestInterceptor {
+  constructor(private readonly cacheService: CacheService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
@@ -19,21 +19,21 @@ export class ConsistentCacheInterceptor implements NestInterceptor {;
     const userId = request.user?.id;
 
     if (method !== 'GET') {
-      return next.handle().pipe(;
+      return next.handle().pipe(
         tap(() => {
           // Invalidate related caches in modification operations
-          this.invalidateRelatedCaches(url, method, userId)
+          this.invalidateRelatedCaches(url, method, userId);
         }),
-      )
+      );
     }
 
     const cacheKey = this.generateCacheKey(url, userId);
     
-    return new Observable(observer => {;
+    return new Observable(observer => {
       this.cacheService.getWithAutoRefresh(
         cacheKey,
         async () => {
-          return new Promise((resolve, reject) => {;
+          return new Promise((resolve, reject) => {
             next.handle().subscribe({
               next: resolve,
               error: reject,
@@ -80,7 +80,7 @@ export class ConsistentCacheInterceptor implements NestInterceptor {;
       case 'POST':
         // Invalidate lists and related caches
         await this.cacheService.invalidateByTags([...tags, 'list']);
-        break
+        break;
       case 'PUT':
       case 'PATCH':
         // Invalidate specific item and lists
@@ -89,11 +89,11 @@ export class ConsistentCacheInterceptor implements NestInterceptor {;
           await this.cacheService.delete(`entity:${entityId}`);
         }
         await this.cacheService.invalidateByTags([...tags, 'list']);
-        break
+        break;
       case 'DELETE':
         // Cascade invalidation
         await this.cacheService.smartInvalidate(`*${url}*`, { cascade: true });
-        break
+        break;
     }
   }
 
