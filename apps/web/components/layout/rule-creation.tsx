@@ -1,7 +1,7 @@
 'use client'
 
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui-old/select'
+import { Checkbox } from '@/components/ui-old/checkbox'
 
 export function RuleCreation() {
   return (

@@ -1,9 +1,9 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui-old/select'
+import { Input } from '@/components/ui-old/input'
+import { DatePicker } from '@/components/ui-old/date-picker'
 
 const filterOptionsMap = {
   owner: ['is', 'is not'],

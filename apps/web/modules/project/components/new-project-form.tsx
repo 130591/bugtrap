@@ -3,14 +3,14 @@ import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui-old/collapsible"
+import { Input } from "@/components/ui-old/input"
+import { Textarea } from "@/components/ui-old/textarea"
+import { Label } from "@/components/ui-old/label"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui-old/checkbox"
+import { Button } from "@/components/ui-old/button"
 
 const TABS = [
 	"Dashboard",

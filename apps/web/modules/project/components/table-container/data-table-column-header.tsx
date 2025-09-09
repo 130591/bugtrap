@@ -3,8 +3,8 @@ import { Column } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp, EyeOff } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui-old/dropdown-menu"
+import { Button } from "@/components/ui-old/button"
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -30,7 +30,7 @@ export function DataTableColumnHeader<TData, TValue>({
             size="sm"
             className="-ml-3 h-8 data-[state=open]:bg-accent"
           >
-            <span className="text-[12px]">{title}</span>
+            <span className="text-[12px] text-[#5B5B5D]">{title}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">

@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, ReactNode } from 'react'
-import { AppSidebar } from '@/components/ui/app-sidebar'
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
-import { Separator } from '@/components/ui/separator'
+import { AppSidebar } from '@/components/ui-old/app-sidebar'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui-old/sidebar'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui-old/breadcrumb'
+import { Separator } from '@/components/ui-old/separator'
 import { Plus, Search, Bell } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { NotificationCard } from '../ui/card-notification'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui-old/select'
+import { NotificationCard } from '../ui-old/card-notification'
 import { SearchModal } from './search-modal'
 import { BugDrawer } from './bug-drawer'
 
@@ -21,7 +21,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between border-b px-4">
+        <header className="flex h-13 shrink-0 items-center justify-between border-b px-4">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />

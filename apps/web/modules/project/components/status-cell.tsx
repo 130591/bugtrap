@@ -1,9 +1,9 @@
 "use client"
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui-old/select"
 import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { TableCell } from "@/components/ui/table"
+import { Badge } from "@/components/ui-old/badge"
+import { TableCell } from "@/components/ui-old/table"
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",

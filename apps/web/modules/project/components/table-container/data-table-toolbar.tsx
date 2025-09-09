@@ -1,7 +1,7 @@
 'use client'
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui-old/badge"
+import { Button } from "@/components/ui-old/button"
 import { 
 	Command, 
 	CommandEmpty, 
@@ -10,10 +10,10 @@ import {
 	CommandItem, 
 	CommandList, 
 	CommandSeparator 
-} from "@/components/ui/command"
-import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui-old/command"
+import { Input } from "@/components/ui-old/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui-old/popover"
+import { Separator } from "@/components/ui-old/separator"
 import { Column, Table } from "@tanstack/react-table"
 import { Check, PlusCircle, X } from "lucide-react"
 import { DataTableViewOptions } from "./data-table-view-options"

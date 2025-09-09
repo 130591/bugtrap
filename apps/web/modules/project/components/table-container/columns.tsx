@@ -4,15 +4,15 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Task } from "./scheme"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
-import { Checkbox } from "@/components/ui/checkbox"
-import { AvatarInitials } from "@/components/ui/avatar-internals"
-import { LabelBadge } from "@/components/ui/badge-label"
-import { CalendarDays } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Checkbox } from "@/components/ui-old/checkbox"
+import { AvatarInitials } from "@/components/ui-old/avatar-internals"
+import { LabelBadge } from "@/components/ui-old/badge-label"
+import { CalendarDays, CheckCircle, Circle, CircleDot, Rocket, XCircle } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui-old/popover"
 import { Tabs } from "@radix-ui/react-tabs"
-import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar } from "@/components/ui/calendar"
-import { Input } from "@/components/ui/input"
+import { TabsContent, TabsList, TabsTrigger } from "@/components/ui-old/tabs"
+import { Calendar } from "@/components/ui-old/calendar"
+import { Input } from "@/components/ui-old/input"
 import clsx from "clsx"
 
 const randomColorClasses = [
@@ -110,7 +110,44 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
-    cell: ({ row }) => <div className="text-[11px]">{row.getValue("status")}</div>,
+    cell: ({ row }) => {
+      const status = row.getValue("status") as string;
+      let IconComponent; // Componente do ícone a ser renderizado
+      let iconColor = "text-gray-500"; // Cor padrão, ajuste conforme necessário
+  
+      switch (status.toLocaleLowerCase()) {
+        case "backlog":
+          IconComponent = Circle
+          iconColor = "text-gray-400"
+          break;
+        case "planned":
+          IconComponent = CircleDot
+          iconColor = "text-blue-500"
+          break;
+        case "in progress":
+          IconComponent = Rocket
+          iconColor = "text-yellow-500"
+          break;
+        case "completed":
+          IconComponent = CheckCircle
+          iconColor = "text-green-500"
+          break;
+        case "canceled":
+          IconComponent = XCircle
+          iconColor = "text-red-500"
+          break;
+        default:
+          IconComponent = Circle
+          iconColor = "text-gray-400"
+      }
+  
+      return (
+        <div className={`flex items-center gap-1 ${iconColor}`}>
+          {IconComponent && <IconComponent size={16} className="cursor-pointer" />}
+          {/* <span className="text-[11px] capitalize">{status as any}</span> */}
+        </div>
+      );
+    },
     filterFn: (row, id, value) => value.includes(row.getValue(id)),
   },
   {

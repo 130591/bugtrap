@@ -121,3 +121,35 @@
     font-family: var(--font-sans), sans-serif
   }
 }
+
+/* Custom scrollbar styles */
+:root {
+  --scrollbar-color: #374151; /* lighter than bg-gray-950 (#030712) */
+  --hover-color: #1f2937; /* lighter tone of bg-gray-950 for better hover effect */
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-color) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-color);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #4b5563;
+}
+
+.hover-custom:hover {
+  color: var(--hover-color) !important;
+}

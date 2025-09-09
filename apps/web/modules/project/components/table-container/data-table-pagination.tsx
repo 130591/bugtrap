@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { Button } from "@/components/ui-old/button"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui-old/select"
 import { Table } from "@tanstack/react-table"
 import {
   ChevronLeft,

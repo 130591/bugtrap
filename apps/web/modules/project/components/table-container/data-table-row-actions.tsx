@@ -14,10 +14,11 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui-old/dropdown-menu"
 import { taskSchema } from "./scheme"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui-old/button"
 import { labels } from "./data"
+import { useAddFavorite } from "../../hooks/mutations/add-favorite"
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
@@ -28,6 +29,8 @@ export function DataTableRowActions<TData>({
 }: DataTableRowActionsProps<TData>) {
   const task = taskSchema.parse(row.original) as any
 
+  const { mutate } = useAddFavorite()
+console.log("row", row)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="text-[11px]">
@@ -36,18 +39,18 @@ export function DataTableRowActions<TData>({
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
         >
           <MoreHorizontal />
-          <span className="sr-only text-[11px]">Open menu</span>
+          <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px] text-[11px]">
-        <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem>Make a copy</DropdownMenuItem>
-        <DropdownMenuItem>Favorite</DropdownMenuItem>
+      <DropdownMenuContent align="end" className="w-[160px]">
+        <DropdownMenuItem className="!text-[13px]">Edit</DropdownMenuItem>
+        <DropdownMenuItem className="!text-[13px]">Make a copy</DropdownMenuItem>
+        <DropdownMenuItem className="!text-[13px]" onClick={() => mutate({ projectId: row.original.id, accountId: 'ssss', userId: '' })}>Favorite</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger className="!text-[13px]">Labels</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuRadioGroup value={task.label}>
+            <DropdownMenuRadioGroup className="!text-[13px]" value={task.label}>
               {labels.map((label) => (
                 <DropdownMenuRadioItem key={label.value} value={label.value}>
                   {label.label}
@@ -57,7 +60,7 @@ export function DataTableRowActions<TData>({
           </DropdownMenuSubContent>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem className="!text-[13px]">
           Delete
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>

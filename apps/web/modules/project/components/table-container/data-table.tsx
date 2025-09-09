@@ -23,9 +23,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-
-import { DataTablePagination } from "./data-table-pagination"
+} from "@/components/ui-old/table"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -121,7 +119,6 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      { table.getRowModel().rows?.length > 8 && <DataTablePagination table={table} />  }
     </div>
   )
 }

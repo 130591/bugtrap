@@ -4,10 +4,10 @@ import { FC, useState } from 'react'
 import { BugIcon, FolderIcon, UserIcon } from 'lucide-react'
 import { ChevronDown, ChevronUp, MoreVertical  } from 'lucide-react'
 import { NewProjectForm } from '@/modules/project/components/new-project-form'
-import { SearchableSelect } from '../ui/searchable-select'
+import { SearchableSelect } from '../ui-old/searchable-select'
 import { ReminderPopover } from './reminder-popover'
-import { SearchableMultiSelect } from '../ui/searchable-multi-select'
-import { Button } from '../ui/button'
+import { SearchableMultiSelect } from '../ui-old/searchable-multi-select'
+import { Button } from '../ui-old/button'
 
 
 interface DrawerModalProps {

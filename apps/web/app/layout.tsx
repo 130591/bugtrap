@@ -1,30 +1,31 @@
-'use client'
+"use client"
 
-import { Inter } from 'next/font/google'
-import { Geist_Mono } from 'next/font/google'
 import './globals.css'
-import AuthProvider from './auth-provider'
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-inter',
-})
-
-const geistMono = Geist_Mono({
-  subsets: ['latin'],
-  variable: '--font-geist-mono',
-})
+import { GeistSans } from 'geist/font/sans'
+import { GeistMono } from 'geist/font/mono'
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable}`}>
-      <body className="antialiased bg-[#FCFCFC]">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+    <html lang="en">
+      <head>
+        <style jsx global>{`
+          :root {
+            --font-geist-sans: ${GeistSans.style.fontFamily};
+            --font-geist-mono: ${GeistMono.style.fontFamily};
+          }
+          body {
+            font-family: ${GeistSans.style.fontFamily};
+            background-color: #0a0a0a;
+            color: #f5f5f5;
+          }
+        `}</style>
+      </head>
+      <body>
+        <div className="flex h-screen bg-gray-950 text-gray-100">{children}</div>
       </body>
     </html>
   )

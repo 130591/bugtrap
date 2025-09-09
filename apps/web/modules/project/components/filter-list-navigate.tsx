@@ -1,11 +1,11 @@
 import { FC } from "react"
 import { useState } from 'react'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from '@/components/ui-old/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui-old/select"
 import { FilterCollapseList } from "./filter-collapse"
 import { DynamicFilter } from "./dynamic-filter"
-import { Calendar } from "@/components/ui/calendar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Calendar } from "@/components/ui-old/calendar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui-old/tabs"
 
 export const FilterListNavegate: FC<any> = ({ filterValues, fnFilter }) => {
 	return (
@@ -352,7 +352,7 @@ function StartDateFilter() {
 }
 
 
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui-old/popover'
 import { format } from 'date-fns'
 
 function DateRangeFilter() {

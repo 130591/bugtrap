@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import { SearchableSelect } from '../ui/searchable-select'
+import { SearchableSelect } from '../ui-old/searchable-select'
 
 export const ReminderPopover = () => {
   const [open, setOpen] = useState(false)

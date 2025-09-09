@@ -1,7 +1,9 @@
-export default function Home() {
+'use client'
+
+import Feed from "./(app)/feed/page"
+
+export default function Index() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <h1 className="text-3xl font-bold">Bem-vindo ao Meu Next.js App!</h1>
-    </div>
+    <Feed />
   )
 }

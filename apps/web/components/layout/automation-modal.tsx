@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui-old/dialog'
+import { Button } from '@/components/ui-old/button'
+import { Input } from '@/components/ui-old/input'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui-old/select'
 import { RuleCreation } from './rule-creation'
 
 interface AutomationModalProps {
