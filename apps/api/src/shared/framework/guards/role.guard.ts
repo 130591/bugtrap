@@ -31,15 +31,15 @@ export class RoleGuard extends JwtAuthGuard implements CanActivate {
       throw new ForbiddenException('You do not have permission to perform this operation.')
     }
 
-    const hasAccess = await this.cache.userHasAccess(user.id, organizationId)
-    if (!hasAccess) {
-      throw new ForbiddenException('User without permission on this account')
-    }
+    // const hasAccess = await this.cache.userHasAccess(user.id, organizationId)
+    // if (!hasAccess) {
+    //   throw new ForbiddenException('User without permission on this account')
+    // }
 
-    const tokenRevoked = await this.cache.isTokenRevoked(user.jti)
-    if (tokenRevoked) {
-      throw new UnauthorizedException('Expired or revoked token')
-    }
+    // const tokenRevoked = await this.cache.isTokenRevoked(user.jti)
+    // if (tokenRevoked) {
+    //   throw new UnauthorizedException('Expired or revoked token')
+    // }
 
     if (!Array.isArray(user.permissions) || user.permissions.length === 0) {
       throw new ForbiddenException('Permissions not defined for the user')

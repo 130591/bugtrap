@@ -95,7 +95,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const errorStack = error instanceof Error ? error.stack : undefined
 
     this.logger.error('Unhandled error occurred', {
-      who: (request.user?.sub || 'anonymous') as string,
+      who: ((request.user as any)?.id || 'anonymous') as string,
       where: `${request.method} ${request.url}`,
       what: 'unhandled_error',
       why: errorMessage,

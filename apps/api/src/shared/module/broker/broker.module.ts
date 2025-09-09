@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common'
+import { DynamicModule, Module, Logger } from '@nestjs/common'
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq'
 import { ConfigService } from '@src/shared/config/service/config.service'
 import { ConfigModule } from '@src/shared/config/config.module'
@@ -26,7 +26,7 @@ export class BrokerModule {
           inject: [ConfigService],
         }),
       ],
-      providers: [BrokerService, EventPublisher],
+      providers: [BrokerService, EventPublisher, Logger],
       exports: [BrokerService],
     }
   }
